@@ -1,0 +1,19 @@
+{
+  "name": "node-messagebrokers",
+  "version": "0.1.0",
+  "description": "Client to easily connect to Message Brokers such as Apache Kafka",
+  "scripts": {
+    "build": "npm run tslint && rm -rf ./build && tsc --strictNullChecks",
+    "tslint": "tslint -c tslint.json -p tsconfig.json",
+    "lint": "npm run tslint",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "dev.scoober@takeaway.com",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^12.0.10",
+    "ts-node": "^8.3.0",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.2"
+  }
+}
