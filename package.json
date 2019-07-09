@@ -10,15 +10,16 @@
   },
   "author": "dev.scoober@takeaway.com",
   "license": "ISC",
+  "dependencies": {
+    "cloudevents-sdk": "^0.2.3",
+    "kafka-node": "^4.1.3",
+    "uuid": "^3.3.2"
+  },
   "devDependencies": {
     "@types/node": "^12.0.10",
     "@types/uuid": "^3.4.4",
     "ts-node": "^8.3.0",
     "tslint": "^5.18.0",
     "typescript": "^3.5.2"
-  },
-  "dependencies": {
-    "kafka-node": "^4.1.3",
-    "uuid": "^3.3.2"
   }
 }
