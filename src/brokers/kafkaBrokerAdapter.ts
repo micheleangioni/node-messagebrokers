@@ -1,3 +1,4 @@
+import { Spec01Payload, Spec02Payload } from 'cloudevents-sdk';
 import kafka, { KafkaClientOptions, ProduceRequest } from 'kafka-node';
 import IEventInterface from '../events/IEventInterface';
 import AbstractBroker from './abstractMessageBroker';
@@ -65,7 +66,11 @@ export default class KafkaBrokerAdapter extends AbstractBroker implements IMessa
     });
   }
 
-  public async sendMessage(aggregate: string, event: IEventInterface, { partitionKey }: MessageOptions): Promise<any> {
+  public async sendMessage(
+    aggregate: string,
+    event: IEventInterface<Spec01Payload | Spec02Payload>,
+    { partitionKey }: MessageOptions,
+  ): Promise<any> {
     const eventPayload = this._createEventPayload(aggregate, event, partitionKey);
 
     this.producer.send([eventPayload], (err, data) => {
@@ -97,7 +102,7 @@ export default class KafkaBrokerAdapter extends AbstractBroker implements IMessa
 
   public async sendMessageList(
     aggregate: string,
-    events: IEventInterface[],
+    events: IEventInterface<Spec01Payload | Spec02Payload>[],
     { partitionKey }: MessageOptions,
   ): Promise<any> {
     const eventPayloadList = events.reduce((acc: ProduceRequest[], event) => {
@@ -141,7 +146,11 @@ export default class KafkaBrokerAdapter extends AbstractBroker implements IMessa
    * @param {string|undefined} key
    * @return {object}
    */
-  private _createEventPayload(aggregate: string, event: IEventInterface, key?: string): ProduceRequest {
+  private _createEventPayload(
+    aggregate: string,
+    event: IEventInterface<Spec01Payload | Spec02Payload>,
+    key?: string,
+  ): ProduceRequest {
     const topic = this.topics[aggregate] ?
       this.topics[aggregate].topic :
       undefined;
