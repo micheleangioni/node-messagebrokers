@@ -1,7 +1,12 @@
 import Cloudevent from 'cloudevents-sdk';
+import v03 from 'cloudevents-sdk/v03';
 import uuidv4 from 'uuid/v4';
 
-type SpecVersion = '0.1' | '0.2';
+type SpecVersion = '0.2' | '0.3';
+
+type Options = {
+  contentType?: string,
+};
 
 export default class CloudEventFactory {
   public static create(
@@ -9,8 +14,19 @@ export default class CloudEventFactory {
     eventType: string,
     source: string,
     data: any,
+    options: Options = {},
   ): Cloudevent {
-    return new Cloudevent(Cloudevent.specs[CloudEventFactory.specVersion])
+    const type = process.env.REVERSE_DNS
+      ? `${process.env.REVERSE_DNS}.${aggregate}.${eventType}`
+      : `${aggregate}.${eventType}`;
+
+    const specOptions: Options = { ...CloudEventFactory.defaultOptions, ...options };
+
+    const cloudevent: Cloudevent = CloudEventFactory.specVersion === '0.3'
+      ? v03.event()
+      : new Cloudevent(Cloudevent.specs[CloudEventFactory.specVersion]);
+
+    return cloudevent
       .type(`${process.env.REVERSE_DNS || ''}.${aggregate}.${eventType}`)
       .source(source)
       .id(uuidv4())
@@ -22,5 +38,9 @@ export default class CloudEventFactory {
     CloudEventFactory.specVersion = specVersion;
   }
 
-  private static specVersion: SpecVersion = '0.2';
+  private static specVersion: SpecVersion = '0.3';
+
+  private static readonly defaultOptions = {
+    contentType: 'application/json',
+  };
 }
