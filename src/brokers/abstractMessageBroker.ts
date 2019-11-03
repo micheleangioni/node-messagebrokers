@@ -1,24 +1,9 @@
-import ILoggerInterface from '../logger/ILoggerInterface';
-
 export default class AbstractBroker {
-  public initialised: boolean;
-  protected logger?: ILoggerInterface;
+  public initialised: boolean = false;
 
-  constructor() {
-    this.initialised = false;
-  }
-
-  public async init() {
+  public async init(_clientOptions?: any, _producerOptions?: any) {
     this.initialised = true;
 
     return true;
-  }
-
-  public getLogger(): ILoggerInterface|undefined {
-    return this.logger;
-  }
-
-  public setLogger(logger: ILoggerInterface): void {
-    this.logger = logger;
   }
 }

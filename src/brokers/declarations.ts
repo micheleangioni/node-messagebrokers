@@ -1,3 +1,55 @@
+import {EachBatchPayload, EachMessagePayload} from 'kafkajs';
+
+export type SslOptions = {
+  ca?: string[],
+  cert: string,
+  key: string,
+};
+
+export type KafkaTopic = {
+  topic: string
+  numPartitions?: number
+  replicationFactor?: number
+  replicaAssignment?: object[]
+  configEntries?: object[],
+};
+
+export type KafkaTopics = {
+  [aggregate: string]: KafkaTopic,
+};
+
+export type PartitionerParams = {
+  message: any,
+  partitionMetadata: {
+    leader: string,
+    partitionId: string,
+  }[],
+  topic: string,
+};
+
+export type Partitioner = (params: PartitionerParams) => number;
+
+export type KafkaJsOptions = {
+  partitionerFunction?: Partitioner,
+  sslOptions?: SslOptions,
+  topics: KafkaTopics,
+};
+
+export type KafkaJsConsumerConfig = {
+  autoCommit?: boolean,
+  autoCommitInterval?: number | null,
+  autoCommitThreshold?: number | null,
+  eachBatchAutoResolve?: boolean,
+  fromBeginning?: boolean,
+  partitionsConsumedConcurrently?: number,
+  eachBatch?: (payload: EachBatchPayload) => Promise<void>,
+  eachMessage?: (payload: EachMessagePayload) => Promise<void>,
+};
+
+export type SendMessageOptions = {
+  partitionKey?: string,
+};
+
 export type MessageErrorData = {
   data?: any,
   err: any,
@@ -5,36 +57,35 @@ export type MessageErrorData = {
   type?: string,
 };
 
-export type SslOptions = {
-  key: string,
-  cert: string,
-  // Necessary only if the server uses a self-signed certificate.
-  ca?: string[],
-  // Necessary only if the server's cert isn't for "localhost".
+export type KafkaNodeConsumerPayload = {
+  offset?: number,
+  partition?: number,
+  topic: string,
+};
+
+export type KafkaNodeConsumerPayloads = KafkaNodeConsumerPayload[];
+
+export type KafkaNodeSslOptions = SslOptions & {
   checkServerIdentity?: () => null,
 };
 
-type KafkaTopic = {
+type KafkaNodeTopic = {
   partitions: number,
   replicationFactor: number,
   topic: string,
 };
 
-export type KafkaTopics = {
-  [key: string]: KafkaTopic,
+export type KafkaNodeTopics = {
+  [key: string]: KafkaNodeTopic,
 };
 
-export type KafkaBrokerOptions = {
+export type KafkaNodeOptions = {
   partitionerType?: number,
   sslOptions?: SslOptions,
-  topics?: KafkaTopics,
-  uri: string,
-};
-
-export type KafkaProducerOptions = {
-  partitionerType?: number,
+  topics?: KafkaNodeTopics,
 };
 
 export type MessageOptions = {
   partitionKey?: string,
 };
+
