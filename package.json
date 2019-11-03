@@ -6,10 +6,10 @@
     "build": "npm run tslint && rm -rf ./build && tsc --strictNullChecks",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
     "lint": "npm run tslint",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --runInBand --forceExit --verbose"
   },
-  "author": "dev.scoober@takeaway.com",
-  "license": "ISC",
+  "author": "Michele Angioni <michele.angioni@gmail.com>",
+  "license": "MIT",
   "jest": {
     "transform": {
       ".(ts|tsx)": "ts-jest"
@@ -26,6 +26,7 @@
   "dependencies": {
     "cloudevents-sdk": "^0.3.2",
     "kafka-node": "^4.1.3",
+    "kafkajs": "^1.11.0",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
@@ -36,6 +37,6 @@
     "ts-jest": "^24.0.2",
     "ts-node": "^8.3.0",
     "tslint": "^5.18.0",
-    "typescript": "^3.5.2"
+    "typescript": "^3.6.4"
   }
 }
