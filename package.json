@@ -1,7 +1,7 @@
 {
   "name": "node-messagebrokers",
   "version": "0.1.0",
-  "description": "Client to easily connect to Message Brokers such as Apache Kafka",
+  "description": "High level library which abstracts low level Message Brokers clients ",
   "scripts": {
     "build": "npm run tslint && rm -rf ./build && tsc --strictNullChecks",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
