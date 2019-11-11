@@ -6,10 +6,10 @@ describe('Testing the KafkaNodeBrokerAdapter', () => {
     const kafkaBrokerOptions: KafkaNodeOptions = {
       partitionerType: 3,
       topics: {
-        player: {
+        user: {
           partitions: 2,
           replicationFactor: 1,
-          topic: 'company.events.application.player',
+          topic: 'company.events.identity.user',
         },
       },
     };

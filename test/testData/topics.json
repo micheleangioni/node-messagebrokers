@@ -1,0 +1,7 @@
+{
+  "user": {
+    "numPartitions": 1,
+    "replicationFactor": 1,
+    "topic": "myCompany.events.identity.user"
+  }
+}
