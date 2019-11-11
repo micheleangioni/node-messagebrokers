@@ -26,8 +26,12 @@ export default class CloudEventFactory {
       ? v03.event()
       : new Cloudevent(Cloudevent.specs[CloudEventFactory.specVersion]);
 
+    if (specOptions.contentType) {
+      cloudevent.contenttype(specOptions.contentType);
+    }
+
     return cloudevent
-      .type(`${process.env.REVERSE_DNS || ''}.${aggregate}.${eventType}`)
+      .type(type)
       .source(source)
       .id(uuidv4())
       .time(new Date())
