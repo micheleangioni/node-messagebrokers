@@ -33,12 +33,12 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
   private producer?: Producer;
   private topics: KafkaTopics;
 
-  constructor(brokers: string[], { partitionerFunction, sslOptions, topics }: KafkaJsOptions) {
+  constructor(brokers: string[], { clientId, partitionerFunction, sslOptions, topics }: KafkaJsOptions) {
     super();
 
     const kafkaConfig: KafkaConfig = {
       brokers,
-      clientId: 'city-manager-api',
+      clientId,
       logLevel: logLevel.INFO,
     };
 

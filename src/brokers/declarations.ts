@@ -30,6 +30,7 @@ export type PartitionerParams = {
 export type Partitioner = (params: PartitionerParams) => number;
 
 export type KafkaJsOptions = {
+  clientId?: string,
   partitionerFunction?: Partitioner,
   sslOptions?: SslOptions,
   topics: KafkaTopics,
