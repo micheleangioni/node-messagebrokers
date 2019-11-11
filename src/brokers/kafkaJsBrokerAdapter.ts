@@ -1,5 +1,5 @@
 // @ts-ignore
-import Cloudevent from 'cloudevents-sdk';
+import Cloudevent, {Spec02Payload, Spec03Payload} from 'cloudevents-sdk';
 import {
   Consumer,
   ConsumerConfig,
@@ -14,6 +14,7 @@ import {
   ProducerRecord,
   RecordMetadata,
 } from 'kafkajs';
+import IEventInterface from '../events/IEventInterface';
 import BrokerInterface from './abstractMessageBroker';
 import {
   KafkaJsConsumerConfig,
@@ -68,10 +69,7 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
    * @param {KafkaJsConsumerConfig} consumerConfig
    * @return Promise<Consumer>
    */
-  public async addConsumer(
-    topic: string,
-    consumerConfig: KafkaJsConsumerConfig = {},
-  ): Promise<Consumer> {
+  public async addConsumer(topic: string, consumerConfig: KafkaJsConsumerConfig = {}): Promise<Consumer> {
     if (!this.initialised || !this.client) {
       throw new Error('Client is not initialized');
     }
@@ -86,21 +84,17 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
    * Send new Cloudevent-formatted events for input Aggregate.
    *
    * @param {string} aggregate
-   * @param {any[]} events
+   * @param {IEventInterface<Spec02Payload | Spec03Payload>[]} events
    * @param {string|undefined} partitionKey
    * @return Promise<RecordMetadata[]>
    */
   public async sendMessage(
     aggregate: string,
-    events: any[],
-    { partitionKey }: SendMessageOptions,
+    events: IEventInterface<Spec02Payload | Spec03Payload>[],
+    { partitionKey }: SendMessageOptions = {},
   ): Promise<RecordMetadata[]> {
     if (!this.initialised) {
       throw new Error('Client is not initialized');
-    }
-
-    if (events.some((cloudevent) => !(cloudevent instanceof Cloudevent))) {
-      throw new Error('Some input cloudevents are not CloudEvent instances');
     }
 
     return (this.producer as Producer).send(this._createEventPayload(aggregate, events, partitionKey));
@@ -112,11 +106,15 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
    *
    * @see https://github.com/cloudevents/spec/blob/v0.2/spec.md
    * @param {string} aggregate
-   * @param {Cloudevent[]} cloudevents
+   * @param {IEventInterface<Spec02Payload | Spec03Payload>[]} cloudevents
    * @param {string|undefined} key
    * @return {object}
    */
-  public _createEventPayload(aggregate: string, cloudevents: any[], key?: string): ProducerRecord {
+  public _createEventPayload(
+    aggregate: string,
+    cloudevents: IEventInterface<Spec02Payload | Spec03Payload>[],
+    key?: string,
+  ): ProducerRecord {
     const topic = this.topics[aggregate] ?
       this.topics[aggregate].topic :
       undefined;
@@ -126,12 +124,12 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
     }
 
     return {
-      messages: cloudevents.map((cloudevent: any) => this.createEventMessage(cloudevent, key)),
+      messages: cloudevents.map((cloudevent) => this.createEventMessage(cloudevent, key)),
       topic,
     };
   }
 
-  private createEventMessage(cloudevent: any, key?: string): Message {
+  private createEventMessage(cloudevent: IEventInterface<Spec02Payload | Spec03Payload>, key?: string): Message {
     return {
       key,
       value: JSON.stringify(cloudevent.format()),

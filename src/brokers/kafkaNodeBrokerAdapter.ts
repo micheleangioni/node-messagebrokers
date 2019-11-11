@@ -4,7 +4,8 @@ import IEventInterface from '../events/IEventInterface';
 import ILoggerInterface from '../logger/ILoggerInterface';
 import AbstractBroker from './abstractMessageBroker';
 import {
-  KafkaNodeOptions, KafkaNodeConsumerPayloads,
+  KafkaNodeConsumerPayloads,
+  KafkaNodeOptions,
   KafkaNodeSslOptions,
   KafkaNodeTopics,
   MessageErrorData,

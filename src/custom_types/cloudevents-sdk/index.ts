@@ -132,7 +132,7 @@ declare module 'cloudevents-sdk' {
 
     public constructor(spec?: Spec02, formatter?: JSONFormatter01);
 
-    public format(): Spec02Payload;
+    public format(): Spec02Payload | Spec03Payload;
     public toString(): string;
 
     public type(type: string): Cloudevent;
