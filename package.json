@@ -9,6 +9,13 @@
     "test": "jest --runInBand --forceExit --verbose"
   },
   "author": "Michele Angioni <michele.angioni@gmail.com>",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/micheleangioni/node-messagebrokers"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "license": "MIT",
   "jest": {
     "transform": {
