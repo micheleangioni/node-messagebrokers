@@ -18,7 +18,7 @@ and [Kafka-node](https://github.com/SOHU-Co/kafka-node).
 
 ## Installation
 
-Run `npm install`.
+To install Node MessageBrokers, run `npm install --save @micheleangioni/node-messagebrokers`.
 
 ## Configuration
 

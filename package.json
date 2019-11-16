@@ -1,5 +1,5 @@
 {
-  "name": "node-messagebrokers",
+  "name": "@micheleangioni/node-messagebrokers",
   "version": "0.1.0",
   "description": "High level library which abstracts low level Message Brokers clients ",
   "scripts": {
@@ -10,11 +10,11 @@
   },
   "author": "Michele Angioni <michele.angioni@gmail.com>",
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/micheleangioni/node-messagebrokers"
+    "type": "git",
+    "url": "https://github.com/micheleangioni/node-messagebrokers"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
+    "registry": "https://npm.pkg.github.com/micheleangioni"
   },
   "license": "MIT",
   "jest": {
