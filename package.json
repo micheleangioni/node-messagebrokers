@@ -13,7 +13,7 @@
     "dist"
   ],
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=10.0.0"
   },
   "scripts": {
     "build": "npm run tslint && rm -rf ./build && tsc --strictNullChecks",

@@ -14,7 +14,7 @@ and [Kafka-node](https://github.com/SOHU-Co/kafka-node).
 
 ## Requirements
 
-- Node.js 8 / 10 / 12
+- Node.js v10+
 
 ## Installation
 
