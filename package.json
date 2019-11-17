@@ -2,11 +2,25 @@
   "name": "@micheleangioni/node-messagebrokers",
   "version": "0.1.0",
   "description": "High level library which abstracts low level Message Brokers clients ",
+  "keywords": ["TypeScript", "Message Brokers", "Kafka"],
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=8.0.0"
+  },
   "scripts": {
     "build": "npm run tslint && rm -rf ./build && tsc --strictNullChecks",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
     "lint": "npm run tslint",
-    "test": "jest --runInBand --forceExit --verbose"
+    "test": "jest --runInBand --forceExit --verbose",
+    "prepublishOnly" : "npm test && npm run lint",
+    "prepare" : "npm run build",
+    "preversion" : "npm run lint",
+    "version" : "npm run lint",
+    "postversion" : "git push && git push --tags"
   },
   "author": "Michele Angioni <michele.angioni@gmail.com>",
   "repository": {
