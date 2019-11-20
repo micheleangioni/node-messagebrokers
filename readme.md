@@ -44,7 +44,7 @@ Node MessageBrokers exposes an event factory for v0.3 and v0.2 of the format.
 In order to use it, import the factory
 
 ```js
-import { CloudEventFactory } from 'node-messagebrokers';
+import { CloudEventFactory } from '@micheleangioni/node-messagebrokers';
 ```
 
 and use the `createV03` factory method for v0.3
@@ -100,7 +100,7 @@ Instantiation is equal for all clients.
 In order to create an instance, it's enough to provide the topic list when using the client factory:
 
 ```js
-import brokerFactory from 'node-messagebrokers';
+import brokerFactory from '@micheleangioni/node-messagebrokers';
 
 const topics = {
   user: {
