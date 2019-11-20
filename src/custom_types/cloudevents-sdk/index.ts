@@ -164,8 +164,18 @@ declare module 'cloudevents-sdk' {
 }
 
 declare module 'cloudevents-sdk/v03' {
-  import Cloudevent, {Spec03} from 'cloudevents-sdk';
+  import Cloudevent from 'cloudevents-sdk';
 
-  export type Spec = Spec03;
-  export function event(): Cloudevent;
+  export class CloudeventV03 extends Cloudevent {
+    public dataContentEncoding(encoding: string): CloudeventV03;
+    public getDataContentEncoding(): string|undefined;
+
+    public dataContentType(encoding: string): CloudeventV03;
+    public getDataContentType(): string|undefined;
+
+    public subject(encoding: string): CloudeventV03;
+    public getSubject(): string|undefined;
+  }
+
+  export function event(): CloudeventV03;
 }
