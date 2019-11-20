@@ -14,14 +14,15 @@ describe('Testing the CloudEventFactory', () => {
   };
 
   it('correctly creates a v0.3 CloudEvent instance', () => {
-    CloudEventFactory.changeEventType('0.3');
     const datacontentencoding = 'base64';
     const datacontenttype = 'datacontenttype';
+    const schemaurl = 'https://myschema.com';
     const subject = '10';
 
-    const event = CloudEventFactory.create(aggregate, eventType, source, playerData, {
+    const event = CloudEventFactory.createV03(aggregate, eventType, source, playerData, {
       datacontentencoding,
       datacontenttype,
+      schemaurl,
       subject,
     });
     const payload = event.format() as Spec03Payload;
@@ -32,6 +33,7 @@ describe('Testing the CloudEventFactory', () => {
     expect(event.getType()).toBe(expectedType);
     expect(event.getSource()).toBe(source);
     expect(event.getData()).toBe(playerData);
+    expect(event.getSchemaurl()).toBe(schemaurl);
 
     expect(payload.specversion).toBe('0.3');
     expect(payload.source).toBe(source);
@@ -43,9 +45,11 @@ describe('Testing the CloudEventFactory', () => {
   });
 
   it('correctly creates a v0.2 CloudEvent instance', () => {
-    CloudEventFactory.changeEventType('0.2');
+    const schemaurl = 'https://myschema.com';
 
-    const event: Cloudevent = CloudEventFactory.create(aggregate, eventType, source, playerData);
+    const event: Cloudevent = CloudEventFactory.createV02(aggregate, eventType, source, playerData, {
+      schemaurl,
+    });
     const payload = event.format() as Spec02Payload;
     const expectedType = `${process.env.REVERSE_DNS}.${aggregate}.${eventType}`;
 
@@ -54,6 +58,7 @@ describe('Testing the CloudEventFactory', () => {
     expect(event.getType()).toBe(expectedType);
     expect(event.getSource()).toBe(source);
     expect(event.getData()).toBe(playerData);
+    expect(event.getSchemaurl()).toBe(schemaurl);
 
     expect(payload.specversion).toBe('0.2');
     expect(payload.source).toBe(source);

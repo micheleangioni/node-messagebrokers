@@ -114,7 +114,6 @@ declare module 'cloudevents-sdk' {
   export default class Cloudevent {
     public static specs: {
       '0.2': Spec02,
-      '0.3': Spec03,
     };
 
     public static formats: {
@@ -132,7 +131,7 @@ declare module 'cloudevents-sdk' {
 
     public constructor(spec?: Spec02, formatter?: JSONFormatter01);
 
-    public format(): Spec02Payload | Spec03Payload;
+    public format(): Spec02Payload;
     public toString(): string;
 
     public type(type: string): Cloudevent;
@@ -164,9 +163,38 @@ declare module 'cloudevents-sdk' {
 }
 
 declare module 'cloudevents-sdk/v03' {
-  import Cloudevent from 'cloudevents-sdk';
+  import { Extensions, Spec03Payload } from 'cloudevents-sdk';
 
-  export class CloudeventV03 extends Cloudevent {
+  export class CloudeventV03 {
+    public format(): Spec03Payload;
+    public toString(): string;
+
+    public type(type: string): CloudeventV03;
+    public getType(): string|undefined;
+
+    public getSpecversion(): string;
+
+    public source(type: string): CloudeventV03;
+    public getSource(): string|undefined;
+
+    public id(id: string|number): CloudeventV03;
+    public getId(): string|undefined;
+
+    public time(type: Date): CloudeventV03;
+    public getTime(): string|undefined;
+
+    public schemaurl(schemaurl: string): CloudeventV03;
+    public getSchemaurl(): string|undefined;
+
+    public contenttype(contenttype: string): CloudeventV03;
+    public getContenttype(): string|undefined;
+
+    public data(data: any): CloudeventV03;
+    public getData(): any;
+
+    public addExtension(key: string, value: any): CloudeventV03;
+    public getExtensions(): Extensions;
+
     public dataContentEncoding(encoding: string): CloudeventV03;
     public getDataContentEncoding(): string|undefined;
 
