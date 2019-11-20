@@ -1,7 +1,7 @@
 import Cloudevent from 'cloudevents-sdk';
 import v03, { CloudeventV03 } from 'cloudevents-sdk/v03';
 import uuidv4 from 'uuid/v4';
-import { CreateEventOptions } from './declarations';
+import { CreateEventV02Options, CreateEventV03Options } from './declarations';
 
 export default class CloudEventFactory {
   public static createV03(
@@ -9,7 +9,7 @@ export default class CloudEventFactory {
     eventType: string,
     source: string,
     data: any,
-    options: CreateEventOptions = {},
+    options: CreateEventV03Options = {},
   ): CloudeventV03 {
     const type = process.env.REVERSE_DNS
       ? `${process.env.REVERSE_DNS}.${aggregate}.${eventType}`
@@ -49,7 +49,7 @@ export default class CloudEventFactory {
     eventType: string,
     source: string,
     data: any,
-    options: CreateEventOptions = {},
+    options: CreateEventV02Options = {},
   ): Cloudevent {
     const type = process.env.REVERSE_DNS
       ? `${process.env.REVERSE_DNS}.${aggregate}.${eventType}`
@@ -74,7 +74,7 @@ export default class CloudEventFactory {
     contentType: 'application/json',
   };
 
-  private static mergeOptionsWithDefaults(options: CreateEventOptions): CreateEventOptions {
+  private static mergeOptionsWithDefaults<T>(options: T): T {
     return { ...CloudEventFactory.defaultOptions, ...options };
   }
 

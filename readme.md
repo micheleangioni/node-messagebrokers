@@ -38,7 +38,59 @@ Node MessageBrokers can be configured by making use of the following environment
 
 ## Event payload format
 
-The created events follow the [clouevents](https://cloudevents.io/) format, by default version 0.3.
+In order to send an event, the payload must follow the [clouevents](https://cloudevents.io/) format.
+
+Node MessageBrokers exposes an event factory for v0.3 and v0.2 of the format.
+In order to use it, import the factory
+
+```js
+import { CloudEventFactory } from 'node-messagebrokers';
+```
+
+and use the `createV03` factory method for v0.3
+
+```typescript
+CloudEventFactory.createV03(
+  aggregate: string,
+  eventType: string,
+  source: string,
+  data: any,
+  options: CreateEventV03Options = {},
+)
+```
+
+where `CreateEventV03Options` is as follows
+
+```typescript
+export type CreateEventV03Options = {
+  contentType?: string,
+  schemaurl?: string,
+  datacontentencoding?: string,
+  datacontenttype?: string,
+  subject?: string,
+};
+```
+
+and the `createV02` factory method for v0.2
+
+```typescript
+CloudEventFactory.createV02(
+  aggregate: string,
+  eventType: string,
+  source: string,
+  data: any,
+  options: CreateEventV02Options = {},
+)
+```
+
+where `CreateEventV02Options` is as follows
+
+```typescript
+export type CreateEventV02Options = {
+  contentType?: string,
+  schemaurl?: string,
+};
+```
 
 ## Usage
 
@@ -220,7 +272,7 @@ const consumer = await broker.addConsumer('myCompany.events.user-management.user
 **Sending messages**
 
 ```js
-const cloudEvent = CloudEventFactory.create(
+const cloudEvent = CloudEventFactory.createV03(
   aggregate,
   eventType,
   source,
@@ -239,7 +291,7 @@ Simple example:
 ```js
 const aggregate = 'user';
 
-const cloudEvent = CloudEventFactory.create(
+const cloudEvent = CloudEventFactory.createV03(
   aggregate,
   'UserCreated',
   '/users',
