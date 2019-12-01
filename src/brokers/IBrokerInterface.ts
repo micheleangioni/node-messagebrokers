@@ -1,4 +1,4 @@
-import {Spec02Payload, Spec03Payload} from 'cloudevents-sdk';
+import {Cloudevent} from 'cloudevents-sdk/v1';
 import IEventInterface from '../events/IEventInterface';
 
 export default interface IBrokerInterface {
@@ -9,7 +9,7 @@ export default interface IBrokerInterface {
   ): Promise<any>;
   sendMessage(
     aggregate: string,
-    cloudevents: IEventInterface<Spec02Payload | Spec03Payload>[],
+    cloudevents: IEventInterface<Cloudevent>[],
     { partitionKey }: any,
   ): Promise<any>;
 }
