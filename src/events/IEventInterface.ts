@@ -1,9 +1,9 @@
-import {Spec02Payload, Spec03Payload} from 'cloudevents-sdk';
+import Cloudevent from 'cloudevents-sdk/v1';
 
-export default interface IEventInterface<T extends Spec02Payload | Spec03Payload> {
+export default interface IEventInterface<T extends Cloudevent> {
   getId(): string|undefined;
   getType(): string|undefined;
   getData(): any;
-  getTime(): string|undefined;
+  getTime(): Date;
   format(): T;
 }

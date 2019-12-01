@@ -45,7 +45,7 @@ describe('Testing the KafkaJsBrokerAdapter', () => {
       fromBeginning: true,
     });
 
-    const cloudEvent = CloudEventFactory.createV03(
+    const cloudEvent = CloudEventFactory.createV1(
       aggregate,
       eventType,
       '/users',

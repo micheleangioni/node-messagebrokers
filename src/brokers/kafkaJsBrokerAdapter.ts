@@ -1,5 +1,4 @@
-// @ts-ignore
-import Cloudevent, {Spec02Payload, Spec03Payload} from 'cloudevents-sdk';
+import Cloudevent from 'cloudevents-sdk/v1';
 import {
   Consumer,
   ConsumerConfig,
@@ -84,13 +83,13 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
    * Send new Cloudevent-formatted events for input Aggregate.
    *
    * @param {string} aggregate
-   * @param {IEventInterface<Spec02Payload | Spec03Payload>[]} events
+   * @param {IEventInterface<Cloudevent>[]} events
    * @param {string|undefined} partitionKey
    * @return Promise<RecordMetadata[]>
    */
   public async sendMessage(
     aggregate: string,
-    events: IEventInterface<Spec02Payload | Spec03Payload>[],
+    events: IEventInterface<Cloudevent>[],
     { partitionKey }: SendMessageOptions = {},
   ): Promise<RecordMetadata[]> {
     if (!this.initialised) {
@@ -106,13 +105,13 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
    *
    * @see https://github.com/cloudevents/spec/blob/v0.2/spec.md
    * @param {string} aggregate
-   * @param {IEventInterface<Spec02Payload | Spec03Payload>[]} cloudevents
+   * @param {IEventInterface<Cloudevent>[]} cloudevents
    * @param {string|undefined} key
    * @return {object}
    */
   public _createEventPayload(
     aggregate: string,
-    cloudevents: IEventInterface<Spec02Payload | Spec03Payload>[],
+    cloudevents: IEventInterface<Cloudevent>[],
     key?: string,
   ): ProducerRecord {
     const topic = this.topics[aggregate] ?
@@ -129,7 +128,7 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
     };
   }
 
-  private createEventMessage(cloudevent: IEventInterface<Spec02Payload | Spec03Payload>, key?: string): Message {
+  private createEventMessage(cloudevent: IEventInterface<Cloudevent>, key?: string): Message {
     return {
       key,
       value: JSON.stringify(cloudevent.format()),

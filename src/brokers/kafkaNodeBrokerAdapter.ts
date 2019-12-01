@@ -1,4 +1,4 @@
-import {Spec02Payload, Spec03Payload} from 'cloudevents-sdk';
+import {Cloudevent} from 'cloudevents-sdk/v1';
 import kafka, {ConsumerGroupOptions, KafkaClient, Producer, ProduceRequest} from 'kafka-node';
 import IEventInterface from '../events/IEventInterface';
 import ILoggerInterface from '../logger/ILoggerInterface';
@@ -128,7 +128,7 @@ export default class KafkaNodeBrokerAdapter extends AbstractBroker implements IM
 
   public async sendMessage(
     aggregate: string,
-    events: IEventInterface<Spec02Payload | Spec03Payload>[],
+    events: IEventInterface<Cloudevent>[],
     { partitionKey }: MessageOptions,
   ): Promise<any> {
     if (!this.producer) {
@@ -254,7 +254,7 @@ export default class KafkaNodeBrokerAdapter extends AbstractBroker implements IM
    */
   private _createEventPayload(
     aggregate: string,
-    event: IEventInterface<Spec02Payload | Spec03Payload>,
+    event: IEventInterface<Cloudevent>,
     key?: string,
   ): ProduceRequest {
     const topic = this.topics[aggregate] ?

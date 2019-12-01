@@ -40,55 +40,32 @@ Node MessageBrokers can be configured by making use of the following environment
 
 In order to send an event, the payload must follow the [clouevents](https://cloudevents.io/) format.
 
-Node MessageBrokers exposes an event factory for v0.3 and v0.2 of the format.
+Node MessageBrokers exposes an event factory for v1.0 of the standard.
 In order to use it, import the factory
 
 ```js
 import { CloudEventFactory } from '@micheleangioni/node-messagebrokers';
 ```
 
-and use the `createV03` factory method for v0.3
+and use the `createV1` factory method
 
 ```typescript
-CloudEventFactory.createV03(
+CloudEventFactory.createV1(
   aggregate: string,
   eventType: string,
   source: string,
   data: any,
-  options: CreateEventV03Options = {},
+  options: CreateEventV1Options = {},
 )
 ```
 
-where `CreateEventV03Options` is as follows
+where `CreateEventV1Options` is as follows
 
 ```typescript
-export type CreateEventV03Options = {
-  contentType?: string,
-  schemaurl?: string,
-  datacontentencoding?: string,
-  datacontenttype?: string,
+export type CreateEventV1Options = {
+  datacontenttype?: string, // default 'application/json'
+  dataschema?: string,
   subject?: string,
-};
-```
-
-and the `createV02` factory method for v0.2
-
-```typescript
-CloudEventFactory.createV02(
-  aggregate: string,
-  eventType: string,
-  source: string,
-  data: any,
-  options: CreateEventV02Options = {},
-)
-```
-
-where `CreateEventV02Options` is as follows
-
-```typescript
-export type CreateEventV02Options = {
-  contentType?: string,
-  schemaurl?: string,
 };
 ```
 
@@ -272,7 +249,7 @@ const consumer = await broker.addConsumer('myCompany.events.user-management.user
 **Sending messages**
 
 ```js
-const cloudEvent = CloudEventFactory.createV03(
+const cloudEvent = CloudEventFactory.createV1(
   aggregate,
   eventType,
   source,
@@ -291,7 +268,7 @@ Simple example:
 ```js
 const aggregate = 'user';
 
-const cloudEvent = CloudEventFactory.createV03(
+const cloudEvent = CloudEventFactory.createV1(
   aggregate,
   'UserCreated',
   '/users',

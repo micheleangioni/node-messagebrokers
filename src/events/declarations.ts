@@ -1,12 +1,5 @@
-export type CreateEventV03Options = {
-  contentType?: string,
-  schemaurl?: string,
-  datacontentencoding?: string,
+export type CreateEventV1Options = {
   datacontenttype?: string,
+  dataschema?: string,
   subject?: string,
-};
-
-export type CreateEventV02Options = {
-  contentType?: string,
-  schemaurl?: string,
 };

@@ -1,35 +1,24 @@
-import Cloudevent from 'cloudevents-sdk';
-import v03, { CloudeventV03 } from 'cloudevents-sdk/v03';
+import Cloudevent, { event } from 'cloudevents-sdk/v1';
 import uuidv4 from 'uuid/v4';
-import { CreateEventV02Options, CreateEventV03Options } from './declarations';
+import { CreateEventV1Options } from './declarations';
 
 export default class CloudEventFactory {
-  public static createV03(
+  public static createV1(
     aggregate: string,
     eventType: string,
     source: string,
     data: any,
-    options: CreateEventV03Options = {},
-  ): CloudeventV03 {
-    const type = process.env.REVERSE_DNS
-      ? `${process.env.REVERSE_DNS}.${aggregate}.${eventType}`
-      : `${aggregate}.${eventType}`;
-
+    options: CreateEventV1Options = {},
+  ): Cloudevent {
     const specOptions = CloudEventFactory.mergeOptionsWithDefaults(options);
-    const cloudevent: CloudeventV03 = v03.event();
-
-    if (specOptions.schemaurl) {
-      cloudevent.schemaurl(specOptions.schemaurl);
-    }
-
-    // v0.3 options
-
-    if (specOptions.datacontentencoding) {
-      cloudevent.dataContentEncoding(specOptions.datacontentencoding);
-    }
+    const cloudevent: Cloudevent = event();
 
     if (specOptions.datacontenttype) {
       cloudevent.dataContentType(specOptions.datacontenttype);
+    }
+
+    if (specOptions.dataschema) {
+      cloudevent.dataschema(specOptions.dataschema);
     }
 
     if (specOptions.subject) {
@@ -37,33 +26,7 @@ export default class CloudEventFactory {
     }
 
     return cloudevent
-      .type(type)
-      .source(source)
-      .id(uuidv4())
-      .time(new Date())
-      .data(data);
-  }
-
-  public static createV02(
-    aggregate: string,
-    eventType: string,
-    source: string,
-    data: any,
-    options: CreateEventV02Options = {},
-  ): Cloudevent {
-    const type = process.env.REVERSE_DNS
-      ? `${process.env.REVERSE_DNS}.${aggregate}.${eventType}`
-      : `${aggregate}.${eventType}`;
-
-    const specOptions = CloudEventFactory.mergeOptionsWithDefaults(options);
-    const cloudevent = new Cloudevent(Cloudevent.specs['0.2']);
-
-    if (specOptions.schemaurl) {
-      cloudevent.schemaurl(specOptions.schemaurl);
-    }
-
-    return cloudevent
-      .type(type)
+      .type(CloudEventFactory.getEventType(aggregate, eventType))
       .source(source)
       .id(uuidv4())
       .time(new Date())
@@ -71,7 +34,7 @@ export default class CloudEventFactory {
   }
 
   private static readonly defaultOptions = {
-    contentType: 'application/json',
+    datacontenttype: 'application/json',
   };
 
   private static mergeOptionsWithDefaults<T>(options: T): T {
