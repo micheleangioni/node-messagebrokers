@@ -34,7 +34,7 @@ describe('Testing the KafkaJsBrokerAdapter', () => {
     const broker = new KafkaJsBrokerAdapter(['localhost:9092'], { topics });
     await broker.init({ groupId: 'my-group' });
 
-    consumer = await broker.addConsumer(topics.user.topic, {
+    consumer = await broker.addConsumer(aggregate, {
       eachMessage: async (payload) => {
         expect(payload.topic).toBe(topics.user.topic);
         expect(payload.message.value.toString() === topics.user.topic);

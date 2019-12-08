@@ -62,16 +62,18 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
   }
 
   /**
-   * Create and attach a new listener to input topic.
+   * Create and attach a new listener to input aggregate.
    *
-   * @param {string} topic
+   * @param {string} aggregate
    * @param {KafkaJsConsumerConfig} consumerConfig
    * @return Promise<Consumer>
    */
-  public async addConsumer(topic: string, consumerConfig: KafkaJsConsumerConfig = {}): Promise<Consumer> {
+  public async addConsumer(aggregate: string, consumerConfig: KafkaJsConsumerConfig = {}): Promise<Consumer> {
     if (!this.initialised || !this.client) {
       throw new Error('Client is not initialized');
     }
+
+    const topic = this.getTopicFromAggregate(aggregate);
 
     await this.client.subscribe({ fromBeginning: consumerConfig.fromBeginning || false, topic });
     await this.client.run(consumerConfig);
@@ -114,13 +116,7 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
     cloudevents: IEventInterface<Cloudevent>[],
     key?: string,
   ): ProducerRecord {
-    const topic = this.topics[aggregate] ?
-      this.topics[aggregate].topic :
-      undefined;
-
-    if (!topic) {
-      throw new Error(`No topic for aggregate: ${aggregate}`);
-    }
+    const topic = this.getTopicFromAggregate(aggregate);
 
     return {
       messages: cloudevents.map((cloudevent) => this.createEventMessage(cloudevent, key)),
@@ -176,5 +172,17 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
     await adminClient.disconnect();
 
     return true;
+  }
+
+  private getTopicFromAggregate(aggregate: string): string {
+    const topic = this.topics[aggregate] ?
+      this.topics[aggregate].topic :
+      undefined;
+
+    if (!topic) {
+      throw new Error(`No topic for aggregate: ${aggregate}`);
+    }
+
+    return topic;
   }
 }
