@@ -62,8 +62,16 @@ describe('Testing the SnsBrokerAdapter', () => {
         body = Buffer.concat(rawBody).toString();
 
         const message: any = JSON.parse(body);
-        const payload = JSON.parse(message.Message);
-        expect(payload.type).toBe('user.UserCreated');
+
+        try {
+          const payload = JSON.parse(message.Message);
+          expect(payload.type).toBe('user.UserCreated');
+        } catch (e) {
+          console.error(e.message);
+          console.error(message.Message);
+          // Error parsing the message, make Jest fail
+          expect(message.Message).toBe('user.UserCreated');
+        }
 
         res.end();
         done();
