@@ -41,7 +41,10 @@ describe('Testing the SnsBrokerAdapter', () => {
     };
 
     const broker = new SnsBrokerAdapter({ endpoint: 'http://localhost:4575', region: 'eu-central-1', topics });
-    await broker.init();
+    await broker.init({
+      accessKeyId: 'dummyAccessKeyId',
+      secretAccessKey: 'dummySecretAccessKey',
+    });
 
     // Add a request listener to the Server to consume the messages
 
