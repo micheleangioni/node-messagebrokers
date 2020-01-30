@@ -1,3 +1,4 @@
+import {SubscriptionAttributesMap} from 'aws-sdk/clients/sns';
 import {EachBatchPayload, EachMessagePayload} from 'kafkajs';
 
 export type SslOptions = {
@@ -90,3 +91,29 @@ export type MessageOptions = {
   partitionKey?: string,
 };
 
+export type AggregatesTopicArns = {
+  [aggregate: string]: string,
+};
+
+export type SnsOptions = {
+  endpoint?: string,
+  region?: string,
+  topics: KafkaTopics,
+};
+
+export enum SnsProtocol {
+  EMAIL = 'email',
+  EMAIL_JSON = 'email-json',
+  HTTP = 'http',
+  HTTPS = 'https',
+  SMS = 'sms',
+  SQS = 'sqs',
+  APPLICATION = 'application',
+  LAMBDA = 'lambda',
+}
+
+export type SnsConsumerOptions = {
+  attributes?: SubscriptionAttributesMap,
+  endpoint: string,
+  protocol: SnsProtocol,
+};

@@ -2,10 +2,12 @@ import {KafkaNodeTopics, KafkaTopics, SslOptions} from './declarations';
 import IBrokerInterface from './IBrokerInterface';
 import KafkaJsAdapter from './kafkaJsBrokerAdapter';
 import KafkaNodeBrokerAdapter from './kafkaNodeBrokerAdapter';
+import SnsBrokerAdapter from './snsBrokerAdapter';
 
 enum Clients {
   KAFKANODE = 'kafkanode',
   KAFKAJS = 'kafkajs',
+  SNS = 'awssns',
 }
 
 const client = process.env.UNDERLYING_CLIENT || Clients.KAFKAJS;
@@ -33,7 +35,6 @@ function getKafkaBrokerList(): string[] {
     : ['localhost:9092'];
 }
 
-
 export default (topics: KafkaTopics) => {
   const sslOptions = getSSLConfiguration();
 
@@ -59,6 +60,14 @@ export default (topics: KafkaTopics) => {
       messageBroker = new KafkaNodeBrokerAdapter(getKafkaBrokerList(), {
         sslOptions,
         topics: convertedTopics,
+      });
+      break;
+    }
+    case Clients.SNS: {
+      messageBroker = new SnsBrokerAdapter({
+        region: process.env.AWS_REGION || 'eu-west-1',
+        topics,
+        ...(process.env.SNS_ENDPOINT && { endpoint: process.env.SNS_ENDPOINT }),
       });
       break;
     }

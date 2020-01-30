@@ -105,7 +105,7 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
    * Create an event payload from some `cloudevents` complaint event instance.
    * The same key will be used for all of them.
    *
-   * @see https://github.com/cloudevents/spec/blob/v0.2/spec.md
+   * @see https://github.com/cloudevents/spec/blob/v1.0/spec.md
    * @param {string} aggregate
    * @param {IEventInterface<Cloudevent>[]} cloudevents
    * @param {string|undefined} key
