@@ -7,10 +7,12 @@
 
 ## Supported Clients
 
-At the present status, Node MessageBrokers provides adapters only for [Apache Kafka](https://kafka.apache.org/).
+Node MessageBrokers provides adapters for [Apache Kafka](https://kafka.apache.org/)
+and [AWS SNS](https://aws.amazon.com/sns/). 
 
 Current supported clients are [KafkaJs](https://github.com/tulios/kafkajs) (default and recommended) 
-and [Kafka-node](https://github.com/SOHU-Co/kafka-node).
+and [Kafka-node](https://github.com/SOHU-Co/kafka-node) for Apache Kafka, the default [AWS Node Client](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/SNS.html)
+for AWS SNS.
 
 ## Requirements
 
@@ -27,8 +29,11 @@ Node MessageBrokers can be configured by making use of the following environment
 - `UNDERLYING_CLIENT`: low level client to use, supported valued:
   - `kafkajs` (**default**): modern Apache Kafka client
   - `kafkanode`: battle-tested Apache Kafka client
+  - `awssns`: default AWS SNS client
 
 - `KAFKA_URI`: comma-separated list of Kafka brokers, default `localhost:9092`
+- `SNS_ENDPOINT`: optional AWS SNS endpoint, default `undefined`
+- `AWS_REGION`: AWS region, default `eu-west-1`
 
 - `SSL_CERT`: SSL certificate
 - `SSL_KEY`: SSL key
@@ -38,7 +43,7 @@ Node MessageBrokers can be configured by making use of the following environment
 
 ## Event payload format
 
-In order to send an event, the payload must follow the [clouevents](https://cloudevents.io/) format.
+In order to send an event, the payload must follow the [cloudevents](https://cloudevents.io/) format.
 
 Node MessageBrokers exposes an event factory for v1.0 of the standard.
 In order to use it, import the factory
@@ -73,7 +78,7 @@ export type CreateEventV1Options = {
 
 **Instantiating a Client**
 
-Instantiation is equal for all clients.
+Instantiation is the same for all clients.
 In order to create an instance, it's enough to provide the topic list when using the client factory:
 
 ```js
@@ -95,8 +100,8 @@ The `topics` parameter must follow the following type definition:
 ```typescript
 type KafkaTopic = {
   topic: string
-  numPartitions?: number
-  replicationFactor?: number
+  numPartitions?: number // Only for Apache Kafka clients
+  replicationFactor?: number // Only for Apache Kafka clients
   replicaAssignment?: object[] // Only for KafkaJs client
   configEntries?: object[],  // Only for KafkaJs client
 };
@@ -109,7 +114,7 @@ type KafkaTopics = {
 This structure enforces to provide a different topic per [Aggregate](https://martinfowler.com/bliki/DDD_Aggregate.html).
 
 Before being used, most clients need to be initialized through the async `init()` method.
-Due to some particularity of each client, most broker methods have different option parameters.
+Due to some particularity of each client, the brokers' `init()` methods have different option parameters.
 
 ### KafkaJs
 
@@ -150,7 +155,7 @@ interface ConsumerConfig {
 Simple example
 
 ```js
-await broker.init(consumerConfig);
+await broker.init({ groupId: 'my-consumer-group-id' });
 ```
 
 **Creating a Consumer**
@@ -320,6 +325,101 @@ const consumer = await broker.addConsumer('myCompany.events.user-management.user
 const aggregate = 'user';
 
 const cloudEvent = CloudEventFactory.factory(
+  aggregate,
+  'UserCreated',
+  '/users',
+  {
+    email: 'voodoo@gmail.com',
+    username: 'Voodoo',
+  },
+);
+
+await broker.sendMessage(
+  aggregate,
+  [cloudEvent],
+)
+```
+
+### AWS SNS
+
+**Initialization**
+
+```js
+await broker.init(initConfigurations);
+```
+
+where `initConfigurations` is optional and has the same structure of the 
+[options constructor parameter of the official SDK](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/SNS.html#constructor-property).
+
+Simple example:
+
+```js
+await broker.init();
+```
+
+**Adding a Consumer**
+
+```js
+const subscriptionResponse = await addConsumer(aggregate, consumerConfig);
+```
+
+where `aggregate` is a string and `consumerConfig` has the following signature
+
+```typescript
+type SnsConsumerOptions = {
+  attributes?: SubscriptionAttributesMap,
+  endpoint: string,
+  protocol: SnsProtocol,
+};
+```
+
+where `endpoint` is the endpoint to which the consumer can be reached, 
+`SnsProtocol` is one of the supporter SNS protocols
+
+```typescript
+enum SnsProtocol {
+  EMAIL = 'email',
+  EMAIL_JSON = 'email-json',
+  HTTP = 'http',
+  HTTPS = 'https',
+  SMS = 'sms',
+  SQS = 'sqs',
+  APPLICATION = 'application',
+  LAMBDA = 'lambda',
+}
+```
+
+and `SubscriptionAttributesMap` is one of the 
+[attributes of the official SDK](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/SNS.html#subscribe-property).
+
+Simple example for an HTTP consumer:
+
+```js
+await broker.addConsumer('user', { endpoint: 'https://myconsumerhost.com/api/example', protocol: SnsProtocol.HTTP });
+```
+
+**Sending messages**
+
+```js
+const cloudEvent = CloudEventFactory.createV1(
+  aggregate,
+  eventType,
+  source,
+  data,
+);
+
+await broker.sendMessage(
+  aggregate,
+  [cloudEvent],
+)
+```
+
+Simple example:
+
+```js
+const aggregate = 'user';
+
+const cloudEvent = CloudEventFactory.createV1(
   aggregate,
   'UserCreated',
   '/users',
