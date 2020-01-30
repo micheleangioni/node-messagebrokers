@@ -1,5 +1,7 @@
 # Node MessageBrokers
 
+[![Build Status](https://api.travis-ci.org/micheleangioni/node-messagebrokers.svg?branch=master)](https://travis-ci.org/micheleangioni/node-messagebrokers)
+
 > High level library which abstracts low level Message Brokers clients 
 > and enforces the [clouevents](https://cloudevents.io/) standard for the event payload.
 
