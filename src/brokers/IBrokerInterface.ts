@@ -10,6 +10,6 @@ export default interface IBrokerInterface {
   sendMessage(
     aggregate: string,
     cloudevents: IEventInterface<Cloudevent>[],
-    { partitionKey }: any,
+    { partitionKey }?: any,
   ): Promise<any>;
 }
