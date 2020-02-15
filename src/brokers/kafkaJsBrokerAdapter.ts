@@ -140,14 +140,17 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
     return consumer;
   }
 
-  private createProducer({ partitionerFunction }: any): Producer {
+  private async createProducer({ partitionerFunction }: any): Promise<Producer> {
     const producerOptions: ProducerConfig = {};
 
     producerOptions.createPartitioner = partitionerFunction
       ? () => partitionerFunction
       : Partitioners.JavaCompatiblePartitioner;
 
-    return this.kafka.producer(producerOptions);
+    const producer = this.kafka.producer(producerOptions);
+    await producer.connect();
+
+    return producer;
   }
 
   private async createTopics(): Promise<boolean> {
