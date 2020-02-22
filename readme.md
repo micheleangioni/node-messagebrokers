@@ -12,8 +12,8 @@
 Node MessageBrokers provides adapters for [Apache Kafka](https://kafka.apache.org/)
 and [AWS SNS](https://aws.amazon.com/sns/). 
 
-Current supported clients are [KafkaJs](https://github.com/tulios/kafkajs) (default and recommended) 
-and [Kafka-node](https://github.com/SOHU-Co/kafka-node) for Apache Kafka, the default [AWS Node Client](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/SNS.html)
+Current supported clients are [KafkaJs](https://github.com/tulios/kafkajs) (default) for Apache Kafka 
+and the official [AWS Node Client](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/SNS.html)
 for AWS SNS.
 
 ## Requirements
@@ -30,7 +30,6 @@ Node MessageBrokers can be configured by making use of the following environment
 
 - `UNDERLYING_CLIENT`: low level client to use, supported valued:
   - `kafkajs` (**default**): modern Apache Kafka client
-  - `kafkanode`: battle-tested Apache Kafka client
   - `awssns`: default AWS SNS client
 
 - `KAFKA_URI`: comma-separated list of Kafka brokers, default `localhost:9092`
@@ -276,57 +275,6 @@ Simple example:
 const aggregate = 'user';
 
 const cloudEvent = CloudEventFactory.createV1(
-  aggregate,
-  'UserCreated',
-  '/users',
-  {
-    email: 'voodoo@gmail.com',
-    username: 'Voodoo',
-  },
-);
-
-await broker.sendMessage(
-  aggregate,
-  [cloudEvent],
-)
-```
-
-### Kafka-node
-
-**Initialization**
-
-```js
-await broker.init();
-```
-
-**Creating a Consumer**
-
-```js
-const consumer = await broker.addConsumer(topic, handler);
-```
-
-where `handler` has the following signature
-
-```typescript
-type Handler = (message: unknown) => void;
-```
-
-Simple example:
-
-```js
-const consumer = await broker.addConsumer('myCompany.events.user-management.user', (message) => {
-  const parsedValue = JSON.parse((message as KafkaMessage).value);
-  console.log('Received message from topic `myCompany.events.user-management.user`');
-  console.log(parsedValue);
-});
-```
-
-**Sending messages**
-
-```js
-const aggregate = 'user';
-
-const cloudEvent = CloudEventFactory.factory(
   aggregate,
   'UserCreated',
   '/users',

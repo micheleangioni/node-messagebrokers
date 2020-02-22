@@ -59,38 +59,6 @@ export type MessageErrorData = {
   type?: string;
 };
 
-export type KafkaNodeConsumerPayload = {
-  offset?: number;
-  partition?: number;
-  topic: string;
-};
-
-export type KafkaNodeConsumerPayloads = KafkaNodeConsumerPayload[];
-
-export type KafkaNodeSslOptions = SslOptions & {
-  checkServerIdentity?: () => null;
-};
-
-type KafkaNodeTopic = {
-  partitions: number;
-  replicationFactor: number;
-  topic: string;
-};
-
-export type KafkaNodeTopics = {
-  [key: string]: KafkaNodeTopic;
-};
-
-export type KafkaNodeOptions = {
-  partitionerType?: number;
-  sslOptions?: SslOptions;
-  topics?: KafkaNodeTopics;
-};
-
-export type MessageOptions = {
-  partitionKey?: string;
-};
-
 export type AggregatesTopicArns = {
   [aggregate: string]: string;
 };

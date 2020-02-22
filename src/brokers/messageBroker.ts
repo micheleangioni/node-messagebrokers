@@ -1,7 +1,6 @@
-import {KafkaNodeTopics, KafkaTopics, SslOptions} from './declarations';
+import {KafkaTopics, SslOptions} from './declarations';
 import IBrokerInterface from './IBrokerInterface';
 import KafkaJsAdapter from './kafkaJsBrokerAdapter';
-import KafkaNodeBrokerAdapter from './kafkaNodeBrokerAdapter';
 import SnsBrokerAdapter from './snsBrokerAdapter';
 
 enum Clients {
@@ -43,24 +42,6 @@ export default (topics: KafkaTopics) => {
   switch (client) {
     case Clients.KAFKAJS: {
       messageBroker = new KafkaJsAdapter(getKafkaBrokerList(), { sslOptions, topics });
-      break;
-    }
-    case Clients.KAFKANODE: {
-      const convertedTopics: KafkaNodeTopics = Object.keys(topics)
-        .reduce((kafkaNodeTopics: KafkaNodeTopics, aggregateName) => {
-          kafkaNodeTopics[aggregateName] = {
-            partitions: topics[aggregateName].numPartitions || 1,
-            replicationFactor: topics[aggregateName].replicationFactor || 1,
-            topic: topics[aggregateName].topic,
-          };
-
-          return kafkaNodeTopics;
-        }, {});
-
-      messageBroker = new KafkaNodeBrokerAdapter(getKafkaBrokerList(), {
-        sslOptions,
-        topics: convertedTopics,
-      });
       break;
     }
     case Clients.SNS: {
