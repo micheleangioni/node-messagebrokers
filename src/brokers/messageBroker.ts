@@ -12,7 +12,7 @@ enum Clients {
 
 const client = process.env.UNDERLYING_CLIENT || Clients.KAFKAJS;
 
-function getSSLConfiguration(): SslOptions|undefined {
+const getSSLConfiguration = (): SslOptions | undefined => {
   if (process.env.SSL_CERT && process.env.SSL_KEY) {
     const sslOptions: SslOptions = {
       cert: process.env.SSL_CERT,
@@ -27,13 +27,13 @@ function getSSLConfiguration(): SslOptions|undefined {
   }
 
   return undefined;
-}
+};
 
-function getKafkaBrokerList(): string[] {
+const getKafkaBrokerList = (): string[] => {
   return process.env.KAFKA_URI
     ? process.env.KAFKA_URI.split(',')
     : ['localhost:9092'];
-}
+};
 
 export default (topics: KafkaTopics) => {
   const sslOptions = getSSLConfiguration();

@@ -4,6 +4,6 @@ export default class AbstractBroker {
   public async init(_clientOptions?: any, _producerOptions?: any) {
     this.initialised = true;
 
-    return true;
+    return Promise.resolve(true);
   }
 }

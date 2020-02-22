@@ -77,13 +77,13 @@ export default class KafkaNodeBrokerAdapter extends AbstractBroker implements IM
       topic,
     }));
 
-    return await this.addKafkaConsumer(consumerPayloads,  handler);
+    return Promise.resolve(this.addKafkaConsumer(consumerPayloads,  handler));
   }
 
-  public async addKafkaConsumer(
+  public addKafkaConsumer(
     consumerPayloads: KafkaNodeConsumerPayloads,
     handler?: (message: unknown) => void,
-  ): Promise<kafka.ConsumerGroup> {
+  ): kafka.ConsumerGroup {
     const topics = consumerPayloads.map((consumerPayload) => consumerPayload.topic);
 
     const consumerGroupOptions: ConsumerGroupOptions = {

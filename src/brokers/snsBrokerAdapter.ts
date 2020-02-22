@@ -28,7 +28,7 @@ export default class SnsBrokerAdapter extends BrokerInterface implements IBroker
   }
 
   public async init(initConfigurations?: ClientConfiguration): Promise<true> {
-    this.sns = await new AWS.SNS({
+    this.sns = new AWS.SNS({
       apiVersion: '2010-03-31',
       ...(this.endpoint && { endpoint: this.endpoint }),
       ...(this.region && { region: this.region }),
@@ -119,9 +119,9 @@ export default class SnsBrokerAdapter extends BrokerInterface implements IBroker
           Attributes: {},
           Name: this.topics[aggregate].topic,
           Tags: [{
-              Key: 'aggregate',
-              Value: aggregate,
-            }],
+            Key: 'aggregate',
+            Value: aggregate,
+          }],
         });
 
         return acc;

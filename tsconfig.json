@@ -19,9 +19,10 @@
     "esModuleInterop": true
   },
   "include": [
-    "src/**/*.ts"
+    "src/",
+    "test/"
   ],
   "exclude": [
-    "node_modules",
+    "node_modules"
   ]
 }

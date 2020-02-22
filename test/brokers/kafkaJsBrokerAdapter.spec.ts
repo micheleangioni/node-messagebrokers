@@ -35,6 +35,7 @@ describe('Testing the KafkaJsBrokerAdapter', () => {
     await broker.init({ groupId: 'my-group' });
 
     consumer = await broker.addConsumer(aggregate, {
+      // eslint-disable-next-line @typescript-eslint/require-await
       eachMessage: async (payload) => {
         expect(payload.topic).toBe(topics.user.topic);
         expect(payload.message.value.toString() === topics.user.topic);

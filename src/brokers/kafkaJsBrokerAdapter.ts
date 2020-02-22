@@ -135,7 +135,7 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
     const options: ConsumerConfig = { groupId: 'my-group', ...consumerOptions };
 
     const consumer = this.kafka.consumer(options);
-    consumer.connect();
+    await consumer.connect();
 
     return consumer;
   }

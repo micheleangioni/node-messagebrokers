@@ -8,18 +8,18 @@ jest.setTimeout(10000); // eslint-disable-line
 describe('Testing the SnsBrokerAdapter', () => {
   let server: Server;
 
-  beforeEach(async (done) => {
+  beforeEach( (done) => {
     server = http.createServer( (req, res) => {
       res.end();
     });
 
-    server.listen(8080,  async () => {
-      console.log('Server is running at 8080');
+    server.listen(3050, () => {
+      console.log('Server is running at 3050');
       done();
     });
   });
 
-  afterEach(async (done) => {
+  afterEach( (done) => {
     server.close();
     done();
   });
@@ -32,7 +32,7 @@ describe('Testing the SnsBrokerAdapter', () => {
 
   it('correctly creates a consumer and sends an event', async (done) => {
     const getPath = '/sns';
-    const consumerUrl = `http://localhost:8080${getPath}`;
+    const consumerUrl = `http://localhost:3050${getPath}`;
     const aggregate = 'user';
     const eventType = 'UserCreated';
     const data = {
@@ -48,7 +48,7 @@ describe('Testing the SnsBrokerAdapter', () => {
 
     // Add a request listener to the Server to consume the messages
 
-    server.addListener('request', async (req, res) => {
+    server.addListener('request',  (req, res) => {
       const { method, url } = req;
 
       if (method !== 'POST' || url !== getPath) { return res.end(); }
