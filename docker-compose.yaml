@@ -1,6 +1,21 @@
 version: '3.5'
 services:
 
+  localstack:
+    image: localstack/localstack:latest
+    ports:
+      - "4567-4599:4567-4599"
+      - "${PORT_WEB_UI-8080}:${PORT_WEB_UI-8080}"
+    environment:
+      - DEBUG="true"
+      - SERVICES=sns
+      - LAMBDA_EXECUTOR=docker
+      - DATA_DIR=/tmp/localstack2
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - "${TMPDIR:-/tmp/localstack2}:/tmp/localstack2"
+      - /var/run/docker.sock:/var/run/docker.sock
+
   zookeeper:
     image: zookeeper
     restart: always
@@ -11,7 +26,7 @@ services:
       ZOO_MY_ID: 1
       ZOO_SERVERS: server.1=0.0.0.0:2888:3888;2181
 
-  kafka-shift-planner:
+  kafka:
     image: 'wurstmeister/kafka'
     depends_on:
       - zookeeper
