@@ -12,8 +12,8 @@ before_install:
   - SERVICES=sns DEBUG=1 localstack start --host & sleep 20
 
 install:
-  - npm install
   - docker-compose up -d
+  - npm install
 
 script:
   - npm test
