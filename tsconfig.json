@@ -1,21 +1,15 @@
 {
   "compilerOptions": {
+    "strict": true,
     "target": "es6",
     "module": "commonjs",
     "sourceMap": true,
     "declaration": true,
     "outDir": "dist",
-    "strict": true,
     "noImplicitAny": true,
     "resolveJsonModule": true,
     "moduleResolution": "node",
-    "lib":["dom", "es2017"],
-    "baseUrl": ".",
-    "paths": {
-      "*": [
-        "node_modules/*"
-      ]
-    },
+    "lib":["es2018"],
     "esModuleInterop": true
   },
   "include": [
@@ -23,6 +17,6 @@
   ],
   "exclude": [
     "node_modules",
-    "test/"
+    "test"
   ]
 }
