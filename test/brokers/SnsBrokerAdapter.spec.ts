@@ -3,7 +3,7 @@ import {SnsProtocol} from '../../src/brokers/declarations';
 import SnsBrokerAdapter from '../../src/brokers/snsBrokerAdapter';
 import CloudEventFactory from '../../src/events/cloudEventFactory';
 
-jest.setTimeout(10000); // eslint-disable-line
+jest.setTimeout(15000); // eslint-disable-line
 
 describe('Testing the SnsBrokerAdapter', () => {
   let server: Server;
@@ -20,8 +20,10 @@ describe('Testing the SnsBrokerAdapter', () => {
   });
 
   afterEach( (done) => {
-    server.close();
-    done();
+    setTimeout(() => {
+      server.close();
+      done();
+    }, 100);
   });
 
   const topics = {

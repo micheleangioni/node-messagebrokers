@@ -1,6 +1,7 @@
 import {Consumer} from 'kafkajs';
 import KafkaJsBrokerAdapter from '../../src/brokers/kafkaJsBrokerAdapter';
 import CloudEventFactory from '../../src/events/cloudEventFactory';
+import {KafkaJsConsumerConfig} from '../../src/brokers/declarations';
 
 jest.setTimeout(10000); // eslint-disable-line
 
@@ -34,17 +35,25 @@ describe('Testing the KafkaJsBrokerAdapter', () => {
     const broker = new KafkaJsBrokerAdapter(['localhost:9092'], { topics });
     await broker.init({ groupId: 'my-group' });
 
-    consumer = await broker.addConsumer(aggregate, {
-      // eslint-disable-next-line @typescript-eslint/require-await
-      eachMessage: async (payload) => {
-        expect(payload.topic).toBe(topics.user.topic);
-        expect(payload.message.value.toString() === topics.user.topic);
-        const eventPayload = JSON.parse(payload.message.value.toString());
-        expect(eventPayload.data).toEqual(data);
-        done();
+    const consumerConfig: KafkaJsConsumerConfig = {
+      aggregates: {
+        user: {
+          // eslint-disable-next-line @typescript-eslint/require-await
+          eachMessage: async (payload: any) => {
+            const eventPayload = JSON.parse(payload.value.toString());
+            expect(eventPayload.data).toEqual(data);
+            done();
+          },
+          topic: topics.user.topic,
+        },
       },
-      fromBeginning: true,
-    });
+      consumerRunConfig: {
+        partitionsConsumedConcurrently: 3,
+      },
+      useBatches: false,
+    };
+
+    consumer = await broker.addConsumer([], consumerConfig);
 
     const cloudEvent = CloudEventFactory.createV1(
       aggregate,

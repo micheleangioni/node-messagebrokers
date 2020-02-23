@@ -2,9 +2,11 @@ import Cloudevent from 'cloudevents-sdk/v1';
 import {
   Consumer,
   ConsumerConfig,
+  ConsumerRunConfig,
   ITopicMetadata,
   Kafka,
   KafkaConfig,
+  KafkaMessage,
   logLevel,
   Message,
   Partitioners,
@@ -13,16 +15,17 @@ import {
   ProducerRecord,
   RecordMetadata,
 } from 'kafkajs';
-import IEventInterface from '../events/IEventInterface';
 import BrokerInterface from './abstractMessageBroker';
 import {
   KafkaJsConsumerConfig,
   KafkaJsOptions,
-  KafkaTopics,
+  KafkaJsTopics,
   Partitioner,
   SendMessageOptions,
+  TopicsHandlers,
 } from './declarations';
 import IBrokerInterface from './IBrokerInterface';
+import IEventInterface from '../events/IEventInterface';
 
 export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBrokerInterface {
   public initialised: boolean = false;
@@ -30,7 +33,11 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
   private readonly kafka: Kafka;
   private readonly partitionerFunction?: Partitioner;
   private producer?: Producer;
-  private topics: KafkaTopics;
+  private topics: KafkaJsTopics;
+
+  private static isKafkaLogLevelValid(inputLogLevel?: logLevel | string): inputLogLevel is logLevel {
+    return Object.values(logLevel).includes(inputLogLevel as logLevel);
+  }
 
   constructor(brokers: string[], { clientId, partitionerFunction, sslOptions, topics }: KafkaJsOptions) {
     super();
@@ -64,21 +71,74 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
   }
 
   /**
-   * Create and attach a new listener to input aggregate.
+   * Create and attach a new consumer.
    *
-   * @param {string} aggregate
+   * @param {any} _
    * @param {KafkaJsConsumerConfig} consumerConfig
    * @return Promise<Consumer>
    */
-  public async addConsumer(aggregate: string, consumerConfig: KafkaJsConsumerConfig = {}): Promise<Consumer> {
+  public async addConsumer(
+    _: any,
+    consumerConfig: KafkaJsConsumerConfig,
+  ): Promise<Consumer> {
     if (!this.initialised || !this.client) {
       throw new Error('Client is not initialized');
     }
 
-    const topic = this.getTopicFromAggregate(aggregate);
+    const topicsHandlers: TopicsHandlers = {};
 
-    await this.client.subscribe({ fromBeginning: consumerConfig.fromBeginning || false, topic });
-    await this.client.run(consumerConfig);
+    const subscribePromises = Object.keys(consumerConfig.aggregates).map((aggregate) => {
+      if (!consumerConfig.aggregates[aggregate]) {
+        throw new Error(`Invalid Consumer options for aggregate ${aggregate}`);
+      }
+
+      const aggregateConfig = consumerConfig.aggregates[aggregate];
+
+      // Fill in also topicsHandlers
+      topicsHandlers[aggregateConfig.topic] = {
+        ...(aggregateConfig.eachMessage && { eachMessage: aggregateConfig.eachMessage }),
+      };
+
+      return this.client?.subscribe({
+        fromBeginning: aggregateConfig.fromBeginning || false,
+        topic: aggregateConfig.topic,
+      });
+    });
+
+    await Promise.all(subscribePromises);
+
+    // Create base config
+    const completeRunConfig: ConsumerRunConfig = {
+      ...consumerConfig.consumerRunConfig,
+    };
+
+    // Check whether eachMessage or eachBatch should be used
+
+    if (consumerConfig.useBatches === true) {
+      completeRunConfig.eachBatch = async ({ batch, resolveOffset, heartbeat, isRunning, isStale }) => {
+        const topic = batch.topic;
+
+        for (const message of batch.messages) {
+          if (!isRunning() || isStale()) {
+            break;
+          }
+
+          await this.processMessage(topicsHandlers, topic, message);
+
+          // Mark a message in the batch as processed
+          resolveOffset(message.offset);
+
+          // Heartbeat the Broker
+          await heartbeat();
+        }
+      };
+    } else {
+      completeRunConfig.eachMessage = async ({ topic, message }) => {
+        await this.processMessage(topicsHandlers, topic, message);
+      };
+    }
+
+    await this.client.run(completeRunConfig);
 
     return this.client;
   }
@@ -107,26 +167,28 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
    * Create an event payload from some `cloudevents` complaint event instance.
    * The same key will be used for all of them.
    *
-   * @see https://github.com/cloudevents/spec/blob/v1.0/spec.md
+   * @see https://github.com/cloudevents/spec/blob/v0.2/spec.md
    * @param {string} aggregate
-   * @param {IEventInterface<Cloudevent>[]} cloudevents
+   * @param {Cloudevent[]} cloudevents
    * @param {string|undefined} key
    * @return {object}
    */
-  public _createEventPayload(
-    aggregate: string,
-    cloudevents: IEventInterface<Cloudevent>[],
-    key?: string,
-  ): ProducerRecord {
-    const topic = this.getTopicFromAggregate(aggregate);
+  public _createEventPayload(aggregate: string, cloudevents: any[], key?: string): ProducerRecord {
+    const topic = this.topics[aggregate] ?
+      this.topics[aggregate].topic :
+      undefined;
+
+    if (!topic) {
+      throw new Error(`No topic for aggregate: ${aggregate}`);
+    }
 
     return {
-      messages: cloudevents.map((cloudevent) => this.createEventMessage(cloudevent, key)),
+      messages: cloudevents.map((cloudevent: any) => this.createEventMessage(cloudevent, key)),
       topic,
     };
   }
 
-  private createEventMessage(cloudevent: IEventInterface<Cloudevent>, key?: string): Message {
+  private createEventMessage(cloudevent: any, key?: string): Message {
     return {
       key,
       value: JSON.stringify(cloudevent.format()),
@@ -134,7 +196,10 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
   }
 
   private async createConsumerClient(consumerOptions?: ConsumerConfig): Promise<Consumer> {
-    const options: ConsumerConfig = { groupId: 'my-group', ...consumerOptions };
+    const options: ConsumerConfig = {
+      ...consumerOptions,
+      ...{ groupId: consumerOptions?.groupId ?? 'default-group' },
+    };
 
     const consumer = this.kafka.consumer(options);
     await consumer.connect();
@@ -179,15 +244,15 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
     return true;
   }
 
-  private getTopicFromAggregate(aggregate: string): string {
-    const topic = this.topics[aggregate] ?
-      this.topics[aggregate].topic :
-      undefined;
-
-    if (!topic) {
-      throw new Error(`No topic for aggregate: ${aggregate}`);
+  private async processMessage(topicsHandlers: TopicsHandlers, topic: string, message: KafkaMessage ) {
+    if (!topicsHandlers[topic] || !topicsHandlers[topic].eachMessage) {
+      return;
     }
 
-    return topic;
+    const handler = topicsHandlers[topic].eachMessage;
+
+    if (handler) {
+      await handler(message);
+    }
   }
 }

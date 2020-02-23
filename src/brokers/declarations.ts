@@ -1,10 +1,28 @@
 import {SubscriptionAttributesMap} from 'aws-sdk/clients/sns';
-import {EachBatchPayload, EachMessagePayload} from 'kafkajs';
 
 export type SslOptions = {
   ca?: string[];
   cert: string;
   key: string;
+};
+
+export type TopicsHandlers = {
+  [topic: string]: {
+    eachBatch?: (message: unknown) => Promise<void>;
+    eachMessage?: (message: unknown) => Promise<void>;
+  };
+};
+
+export type KafkaJsTopic = {
+  topic: string;
+  numPartitions?: number;
+  replicationFactor?: number;
+  replicaAssignment?: object[];
+  configEntries?: object[];
+};
+
+export type KafkaJsTopics = {
+  [aggregate: string]: KafkaJsTopic;
 };
 
 export type KafkaTopic = {
@@ -37,15 +55,25 @@ export type KafkaJsOptions = {
   topics: KafkaTopics;
 };
 
-export type KafkaJsConsumerConfig = {
-  autoCommit?: boolean;
-  autoCommitInterval?: number | null;
-  autoCommitThreshold?: number | null;
-  eachBatchAutoResolve?: boolean;
+export type AggregateConsumerConf = {
+  eachBatch?: (message: unknown) => Promise<void>;
+  eachMessage?: (message: unknown) => Promise<void>;
   fromBeginning?: boolean;
-  partitionsConsumedConcurrently?: number;
-  eachBatch?: (payload: EachBatchPayload) => Promise<void>;
-  eachMessage?: (payload: EachMessagePayload) => Promise<void>;
+  topic: string;
+};
+
+export type KafkaJsConsumerConfig = {
+  aggregates: {
+    [aggregate: string]: AggregateConsumerConf;
+  };
+  consumerRunConfig?: {
+    autoCommit?: boolean;
+    autoCommitInterval?: number | null;
+    autoCommitThreshold?: number | null;
+    eachBatchAutoResolve?: boolean;
+    partitionsConsumedConcurrently?: number;
+  };
+  useBatches?: boolean;
 };
 
 export type SendMessageOptions = {
