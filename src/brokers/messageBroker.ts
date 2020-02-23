@@ -4,7 +4,6 @@ import KafkaJsAdapter from './kafkaJsBrokerAdapter';
 import SnsBrokerAdapter from './snsBrokerAdapter';
 
 enum Clients {
-  KAFKANODE = 'kafkanode',
   KAFKAJS = 'kafkajs',
   SNS = 'awssns',
 }
@@ -41,7 +40,11 @@ export default (topics: KafkaTopics) => {
 
   switch (client) {
     case Clients.KAFKAJS: {
-      messageBroker = new KafkaJsAdapter(getKafkaBrokerList(), { sslOptions, topics });
+      messageBroker = new KafkaJsAdapter(getKafkaBrokerList(), {
+        ...(process.env.KAFKA_CLIENT_ID && { clientId: process.env.KAFKA_CLIENT_ID }),
+        sslOptions,
+        topics,
+      });
       break;
     }
     case Clients.SNS: {

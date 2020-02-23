@@ -37,8 +37,10 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
 
     const kafkaConfig: KafkaConfig = {
       brokers,
-      clientId,
-      logLevel: logLevel.INFO,
+      logLevel: KafkaJsBrokerAdapter.isKafkaLogLevelValid(process.env.KAFKA_LOG_LEVEL)
+        ? process.env.KAFKA_LOG_LEVEL
+        : logLevel.INFO,
+      ...(clientId && { clientId }),
     };
 
     if (sslOptions) {
