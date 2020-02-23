@@ -62,7 +62,9 @@ describe('Testing the KafkaJsBrokerAdapter', () => {
       data,
     );
 
-    await broker.sendMessage(aggregate, [cloudEvent]);
+    setTimeout(async () => {
+      await broker.sendMessage(aggregate, [cloudEvent]);
+    }, 1000)
   });
 
   it('correctly creates a consumer using eachBatch and sends an event', async (done) => {
@@ -103,6 +105,8 @@ describe('Testing the KafkaJsBrokerAdapter', () => {
       data,
     );
 
-    await broker.sendMessage(aggregate, [cloudEvent]);
+    setTimeout(async () => {
+      await broker.sendMessage(aggregate, [cloudEvent]);
+    }, 1000)
   });
 });
