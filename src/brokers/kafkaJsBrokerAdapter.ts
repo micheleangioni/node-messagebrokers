@@ -95,9 +95,7 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
       const aggregateConfig = consumerConfig.aggregates[aggregate];
 
       // Fill in also topicsHandlers
-      topicsHandlers[aggregateConfig.topic] = {
-        ...(aggregateConfig.eachMessage && { eachMessage: aggregateConfig.eachMessage }),
-      };
+      topicsHandlers[aggregateConfig.topic] = { handler: aggregateConfig.handler };
 
       return this.client?.subscribe({
         fromBeginning: aggregateConfig.fromBeginning || false,
@@ -245,14 +243,10 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
   }
 
   private async processMessage(topicsHandlers: TopicsHandlers, topic: string, message: KafkaMessage ) {
-    if (!topicsHandlers[topic] || !topicsHandlers[topic].eachMessage) {
+    if (!topicsHandlers[topic] || !topicsHandlers[topic].handler) {
       return;
     }
 
-    const handler = topicsHandlers[topic].eachMessage;
-
-    if (handler) {
-      await handler(message);
-    }
+    await topicsHandlers[topic].handler(message);
   }
 }

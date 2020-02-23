@@ -3,7 +3,7 @@ import KafkaJsBrokerAdapter from '../../src/brokers/kafkaJsBrokerAdapter';
 import CloudEventFactory from '../../src/events/cloudEventFactory';
 import {KafkaJsConsumerConfig} from '../../src/brokers/declarations';
 
-jest.setTimeout(10000); // eslint-disable-line
+jest.setTimeout(20000); // eslint-disable-line
 
 describe('Testing the KafkaJsBrokerAdapter', () => {
   let consumer: Consumer;
@@ -24,7 +24,7 @@ describe('Testing the KafkaJsBrokerAdapter', () => {
     },
   };
 
-  it('correctly creates a consumer and sends an event', async (done) => {
+  it('correctly creates a consumer using eachMessage and sends an event', async (done) => {
     const aggregate = 'user';
     const eventType = 'UserCreated';
     const data = {
@@ -39,7 +39,7 @@ describe('Testing the KafkaJsBrokerAdapter', () => {
       aggregates: {
         user: {
           // eslint-disable-next-line @typescript-eslint/require-await
-          eachMessage: async (payload: any) => {
+          handler: async (payload: any) => {
             const eventPayload = JSON.parse(payload.value.toString());
             expect(eventPayload.data).toEqual(data);
             done();
@@ -51,6 +51,47 @@ describe('Testing the KafkaJsBrokerAdapter', () => {
         partitionsConsumedConcurrently: 3,
       },
       useBatches: false,
+    };
+
+    consumer = await broker.addConsumer([], consumerConfig);
+
+    const cloudEvent = CloudEventFactory.createV1(
+      aggregate,
+      eventType,
+      '/users',
+      data,
+    );
+
+    await broker.sendMessage(aggregate, [cloudEvent]);
+  });
+
+  it('correctly creates a consumer using eachBatch and sends an event', async (done) => {
+    const aggregate = 'user';
+    const eventType = 'UserCreated';
+    const data = {
+      email: 'voodoo@gmail.com',
+      username: 'Voodoo',
+    };
+
+    const broker = new KafkaJsBrokerAdapter(['localhost:9092'], { topics });
+    await broker.init({ groupId: 'my-group' });
+
+    const consumerConfig: KafkaJsConsumerConfig = {
+      aggregates: {
+        user: {
+          // eslint-disable-next-line @typescript-eslint/require-await
+          handler: async (payload: any) => {
+            const eventPayload = JSON.parse(payload.value.toString());
+            expect(eventPayload.data).toEqual(data);
+            done();
+          },
+          topic: topics.user.topic,
+        },
+      },
+      consumerRunConfig: {
+        partitionsConsumedConcurrently: 3,
+      },
+      useBatches: true,
     };
 
     consumer = await broker.addConsumer([], consumerConfig);

@@ -8,8 +8,7 @@ export type SslOptions = {
 
 export type TopicsHandlers = {
   [topic: string]: {
-    eachBatch?: (message: unknown) => Promise<void>;
-    eachMessage?: (message: unknown) => Promise<void>;
+    handler: (message: unknown) => Promise<void>;
   };
 };
 
@@ -56,8 +55,7 @@ export type KafkaJsOptions = {
 };
 
 export type AggregateConsumerConf = {
-  eachBatch?: (message: unknown) => Promise<void>;
-  eachMessage?: (message: unknown) => Promise<void>;
+  handler: (message: unknown) => Promise<void>;
   fromBeginning?: boolean;
   topic: string;
 };
