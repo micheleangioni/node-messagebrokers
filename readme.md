@@ -7,7 +7,20 @@
 
 **Library still in Beta version and in development**
 
-## Supported Clients
+## Contents
+
+- [Supported Clients](#clients)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Event payload format](#payload)
+- [Usage](#usage)
+  - [KafkaJs](#usage-kafkajs)
+  - [AWS SNS](#usage-sns)
+- [Contribution Guidelines](#guidelines)
+- [License](#license)
+
+## <a name="clients"></a>Supported Clients
 
 Node MessageBrokers provides adapters for [Apache Kafka](https://kafka.apache.org/)
 and [AWS SNS](https://aws.amazon.com/sns/). 
@@ -16,15 +29,15 @@ Current supported clients are [KafkaJs](https://github.com/tulios/kafkajs) (defa
 and the official [AWS Node Client](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/SNS.html)
 for AWS SNS.
 
-## Requirements
+## <a name="requirements"></a>Requirements
 
 - Node.js v10+
 
-## Installation
+## <a name="installation"></a>Installation
 
 To install Node MessageBrokers, run `npm install --save @micheleangioni/node-messagebrokers`.
 
-## Configuration
+## <a name="configuration"></a>Configuration
 
 Node MessageBrokers can be configured by making use of the following environment variables:
 
@@ -33,6 +46,13 @@ Node MessageBrokers can be configured by making use of the following environment
   - `awssns`: default AWS SNS client
 
 - `KAFKA_URI`: comma-separated list of Kafka brokers, default `localhost:9092`
+- `KAFKA_CLIENT_ID`: client id for the Kafka connection. If not set, a random generated will be used
+- `KAFKA_LOG_LEVEL`: set the logging level of the KafkaJs client:
+    - 0 = nothing
+    - 1 = error
+    - 2 = warning
+    - 4 = info (default)
+    - 5 = debug
 - `SNS_ENDPOINT`: optional AWS SNS endpoint, default `undefined`
 - `AWS_REGION`: AWS region, default `eu-west-1`
 
@@ -42,7 +62,7 @@ Node MessageBrokers can be configured by making use of the following environment
 
 - `REVERSE_DNS`: Reverse DNS to customise the `type` field of the event payload
 
-## Event payload format
+## <a name="payload"></a>Event payload format
 
 In order to send an event, the payload must follow the [cloudevents](https://cloudevents.io/) format.
 
@@ -75,7 +95,7 @@ export type CreateEventV1Options = {
 };
 ```
 
-## Usage
+## <a name="usage"></a>Usage
 
 **Instantiating a Client**
 
@@ -93,7 +113,7 @@ const topics = {
   }
 };
 
-const broker = brokerFactory(topics);
+const broker = brokerFactory({ topics });
 ```
 
 The `topics` parameter must follow the following type definition:
@@ -114,10 +134,39 @@ type KafkaTopics = {
 
 This structure enforces to provide a different topic per [Aggregate](https://martinfowler.com/bliki/DDD_Aggregate.html).
 
-Before being used, most clients need to be initialized through the async `init()` method.
+Every client has its own instantiation options as well. 
+
+Furthermore, before being used, most clients need to be initialized through the async `init()` method.
 Due to some particularity of each client, the brokers' `init()` methods have different option parameters.
 
-### KafkaJs
+### <a name="usage-kafkajs"></a>KafkaJs
+
+**Instantiation**
+
+```js
+import brokerFactory from '@micheleangioni/node-messagebrokers';
+
+// SSL certificate
+const sslOptions = {
+  ca: '', // TODO To be set
+  cert: '', // TODO To be set
+  key: '' // TODO To be set
+};
+
+const topics = {
+  user: {
+    topic: 'myCompany.events.identity.user',
+    numPartitions: 16,
+    replicationFactor: 3,
+  }
+};
+
+const broker = brokerFactory({ 
+  clientId: 'my-app',
+  sslOptions,
+  topics
+});
+```
 
 **Initialization**
 
@@ -162,19 +211,19 @@ await broker.init({ groupId: 'my-consumer-group-id' });
 **Creating a Consumer**
 
 ```js
-const consumer = await broker.addConsumer(topic, consumerConfig);
+const consumer = await broker.addConsumer([], consumerConfig); // the first argument is ignored
 ```
 
 where `consumerConfig` has the following type signature:
 
 ```typescript
-interface IHeaders {
-  [key: string]: Buffer
+export interface IHeaders {
+  [key: string]: Buffer | string
 }
 
-type KafkaMessage = {
+export type KafkaMessage = {
   key: Buffer
-  value: Buffer
+  value: Buffer // Message payload
   timestamp: string
   size: number
   attributes: number
@@ -182,73 +231,46 @@ type KafkaMessage = {
   headers?: IHeaders
 }
 
-interface EachMessagePayload {
-  topic: string
-  partition: number
-  message: KafkaMessage
-}
-
-type Batch = {
-  topic: string
-  partition: number
-  highWatermark: string
-  messages: KafkaMessage[]
-  isEmpty(): boolean
-  firstOffset(): string | null
-  lastOffset(): string
-  offsetLag(): string
-  offsetLagLow(): string
-}
-
-interface PartitionOffset {
-  partition: number
-  offset: string
-}
-
-interface TopicOffsets {
-  topic: string
-  partitions: PartitionOffset[]
-}
-
-interface Offsets {
-  topics: TopicOffsets[]
-}
-
-interface OffsetsByTopicPartition {
-  topics: TopicOffsets[]
-}
-
-interface EachBatchPayload {
-  batch: Batch
-  resolveOffset(offset: string): void
-  heartbeat(): Promise<void>
-  commitOffsetsIfNecessary(offsets?: Offsets): Promise<void>
-  uncommittedOffsets(): Promise<OffsetsByTopicPartition>
-  isRunning(): boolean
-  isStale(): boolean
-}
+export type AggregateConsumerConf = {
+  handler: (message: KafkaMessage) => Promise<void>;
+  fromBeginning?: boolean; // Fetch messages from the beginning of the topic, default false
+  topic: string;
+};
 
 type KafkaJsConsumerConfig = {
-  autoCommit?: boolean,
-  autoCommitInterval?: number | null,
-  autoCommitThreshold?: number | null,
-  eachBatchAutoResolve?: boolean,
-  fromBeginning?: boolean,
-  partitionsConsumedConcurrently?: number,
-  eachBatch?: (payload: EachBatchPayload) => Promise<void>,
-  eachMessage?: (payload: EachMessagePayload) => Promise<void>,
+  aggregates: {
+    [aggregate: string]: AggregateConsumerConf;
+  };
+  consumerRunConfig?: {
+    autoCommit?: boolean;
+    autoCommitInterval?: number | null;
+    autoCommitThreshold?: number | null;
+    eachBatchAutoResolve?: boolean;
+    partitionsConsumedConcurrently?: number; // Number of running concurrent partition handlers, default 1
+  };
+  useBatches?: boolean; // true: use batches, false (default): use single messages
 };
 ```
 
 Simple example:
 
 ```js
-const consumer = await broker.addConsumer('myCompany.events.user-management.user', {
-  eachMessage: async (payload) => {
-    console.log(`Incoming message from topic ${payload.topic} and partition ${payload.partition}`);
-    console.log(payload.message);
+const consumer = await broker.addConsumer([], {
+  aggregates: {
+    user: {
+      // eslint-disable-next-line @typescript-eslint/require-await
+      handler: async (message: KafkaMessage) => {
+        const eventPayload = JSON.parse(message.value.toString());
+        expect(eventPayload.data).toEqual(data);
+        done();
+      },
+      topic: 'myCompany.events.identity.user',
+    },
   },
-  fromBeginning: true,
+  consumerRunConfig: {
+    partitionsConsumedConcurrently: 3,
+  },
+  useBatches: false,
 });
 ```
 
@@ -290,7 +312,19 @@ await broker.sendMessage(
 )
 ```
 
-### AWS SNS
+### <a name="usage-sns"></a>AWS SNS
+
+**Instantiation**
+
+```js
+import brokerFactory from '@micheleangioni/node-messagebrokers';
+
+const broker = brokerFactory({ 
+  endpoint: 'http://localhost:4575', 
+  region: 'eu-central-1', 
+  topics
+});
+```
 
 **Initialization**
 
@@ -385,10 +419,10 @@ await broker.sendMessage(
 )
 ```
 
-## Contribution Guidelines
+## <a name="guidelines"></a>Contribution Guidelines
 
 Pull requests are welcome. Help is needed to add other clients.
 
-## License
+## <a name="license"></a>License
 
 Node MessageBrokers is free software distributed under the terms of the MIT license.
