@@ -1,4 +1,5 @@
 import {SubscriptionAttributesMap} from 'aws-sdk/clients/sns';
+import {KafkaMessage} from 'kafkajs';
 
 export type SslOptions = {
   ca?: string[];
@@ -8,7 +9,7 @@ export type SslOptions = {
 
 export type TopicsHandlers = {
   [topic: string]: {
-    handler: (message: unknown) => Promise<void>;
+    handler: (message: KafkaMessage) => Promise<void>;
   };
 };
 
@@ -55,7 +56,7 @@ export type KafkaJsOptions = {
 };
 
 export type AggregateConsumerConf = {
-  handler: (message: unknown) => Promise<void>;
+  handler: (message: KafkaMessage) => Promise<void>;
   fromBeginning?: boolean;
   topic: string;
 };

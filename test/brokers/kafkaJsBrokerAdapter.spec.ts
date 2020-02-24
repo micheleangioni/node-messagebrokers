@@ -1,4 +1,4 @@
-import {Consumer} from 'kafkajs';
+import {Consumer, KafkaMessage} from 'kafkajs';
 import KafkaJsBrokerAdapter from '../../src/brokers/kafkaJsBrokerAdapter';
 import CloudEventFactory from '../../src/events/cloudEventFactory';
 import {KafkaJsConsumerConfig} from '../../src/brokers/declarations';
@@ -39,7 +39,7 @@ describe('Testing the KafkaJsBrokerAdapter', () => {
       aggregates: {
         user: {
           // eslint-disable-next-line @typescript-eslint/require-await
-          handler: async (payload: any) => {
+          handler: async (payload: KafkaMessage) => {
             const eventPayload = JSON.parse(payload.value.toString());
             expect(eventPayload.data).toEqual(data);
             done();
@@ -82,7 +82,7 @@ describe('Testing the KafkaJsBrokerAdapter', () => {
       aggregates: {
         user: {
           // eslint-disable-next-line @typescript-eslint/require-await
-          handler: async (payload: any) => {
+          handler: async (payload: KafkaMessage) => {
             const eventPayload = JSON.parse(payload.value.toString());
             expect(eventPayload.data).toEqual(data);
             done();
