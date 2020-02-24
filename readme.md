@@ -1,6 +1,8 @@
 # Node MessageBrokers
 
+![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/micheleangioni/node-messagebrokers?color=stable&label=version)
 [![Build Status](https://api.travis-ci.org/micheleangioni/node-messagebrokers.svg?branch=master)](https://travis-ci.org/micheleangioni/node-messagebrokers)
+[![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
 
 > High level library which abstracts low level Message Brokers clients 
 > and enforces the [clouevents](https://cloudevents.io/) standard for the event payload.
