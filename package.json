@@ -1,6 +1,6 @@
 {
   "name": "@micheleangioni/node-messagebrokers",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "High level library which abstracts low level Message Brokers clients ",
   "keywords": [
     "TypeScript",
