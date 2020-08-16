@@ -91,6 +91,9 @@ describe('Testing the SnsBrokerAdapter', () => {
       data,
     );
 
-    await broker.sendMessage(aggregate, [cloudEvent]);
+    const snsResponses = await broker.sendMessage(aggregate, [cloudEvent]);
+    expect(snsResponses[0].MessageId).not.toBeFalsy();
+    done();
+
   });
 });

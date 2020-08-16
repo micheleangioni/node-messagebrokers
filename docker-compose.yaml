@@ -20,3 +20,18 @@ services:
     environment:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_HOST_NAME: localhost
+
+  localstack:
+    image: localstack/localstack:0.11.3
+    ports:
+      - "4567-4599:4567-4599"
+      - "${PORT_WEB_UI-8080}:${PORT_WEB_UI-8080}"
+    environment:
+      - DEBUG=1
+      - LAMBDA_EXECUTOR=docker
+      - DATA_DIR=/tmp/localstack2
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - SERVICES=sns
+    volumes:
+      - "${TMPDIR:-/tmp/localstack2}:/tmp/localstack2"
+      - /var/run/docker.sock:/var/run/docker.sock
