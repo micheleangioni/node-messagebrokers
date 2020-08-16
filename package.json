@@ -52,7 +52,7 @@
     "cloudevents": "^3.0.1",
     "kafka-node": "^4.1.3",
     "kafkajs": "^1.12.0",
-    "uuid": "^3.3.2"
+    "uuid": "^8.3.0"
   },
   "devDependencies": {
     "@types/jest": "^25.1.2",
