@@ -4,10 +4,9 @@ node_js:
   - '12'
   - '10'
 
-python:
-  - '3.7'
-
 before_install:
+  - sudo apt-get update
+  - sudo apt-get install python3
   - pip install "localstack[full]" --user localstack
   - SERVICES=sns DEBUG=1 localstack start --host & sleep 20
 
