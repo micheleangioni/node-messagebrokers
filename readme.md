@@ -19,6 +19,7 @@
 - [Usage](#usage)
   - [KafkaJs](#usage-kafkajs)
   - [AWS SNS](#usage-sns)
+- [Tests](#tests)
 - [Contribution Guidelines](#guidelines)
 - [License](#license)
 
@@ -420,6 +421,15 @@ await broker.sendMessage(
   [cloudEvent],
 )
 ```
+
+## <a name="tests"></a>Tests
+
+In order to run the tests, follow the following steps:
+
+- Install Localstack locally (non Dockerized version) via `pip install "localstack[full]" --user localstack`
+- Run Localstack via `SERVICES=sns DEBUG=1 localstack start --host`
+- Run docker compose via `docker-compose up -d` (`TMPDIR=/private$TMPDIR docker-compose up` in MacOS)
+- Run the tests via `npm test`
 
 ## <a name="guidelines"></a>Contribution Guidelines
 
