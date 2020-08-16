@@ -6,7 +6,7 @@ node_js:
 
 before_install:
   - sudo apt-get update
-  - sudo apt-get install python3 python3-pip
+  - sudo apt-get install python3 python3-setuptools python3-pip
   - pip3 install "localstack[full]" --user localstack
   - SERVICES=sns DEBUG=1 localstack start --host & sleep 20
 
