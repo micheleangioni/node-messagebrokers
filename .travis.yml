@@ -15,7 +15,7 @@ before_install:
   - pip install --upgrade pip
   - pip3 install --upgrade pip
   - pip install "localstack"
-  - SERVICES=sns DEBUG=1 localstack start --host & sleep 20
+  - SERVICES=sns DEBUG=1 localstack start & sleep 20
 
 install:
   - docker-compose up -d
