@@ -1,6 +1,5 @@
 import AWS, {AWSError, SNS} from 'aws-sdk';
 import {ClientConfiguration, CreateTopicResponse, PublishResponse, SubscribeResponse} from 'aws-sdk/clients/sns';
-import Cloudevent from 'cloudevents-sdk/v1';
 import IEventInterface from '../events/IEventInterface';
 import BrokerInterface from './abstractMessageBroker';
 import {
@@ -78,12 +77,12 @@ export default class SnsBrokerAdapter extends BrokerInterface implements IBroker
    * Send new Cloudevent-formatted events for input Aggregate.
    *
    * @param {string} aggregate
-   * @param {IEventInterface<Cloudevent>[]} events
+   * @param {IEventInterface[]} events
    * @return Promise<RecordMetadata[]>
    */
   public async sendMessage(
     aggregate: string,
-    events: IEventInterface<Cloudevent>[],
+    events: IEventInterface[],
   ): Promise<PublishResponse[]> {
     if (!this.initialised || !this.sns) {
       throw new Error('Client is not initialized');
@@ -95,7 +94,7 @@ export default class SnsBrokerAdapter extends BrokerInterface implements IBroker
 
     const publishPromises: Promise<PublishResponse>[] = events.map((event) => {
       const params: SNS.Types.PublishInput = {
-        Message: JSON.stringify(event.format()),
+        Message: JSON.stringify(event.toJSON()),
         // MessageAttributes: {},
         TopicArn: this.topicDescriptions[aggregate],
       };

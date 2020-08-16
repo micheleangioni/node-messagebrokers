@@ -1,9 +1,7 @@
-import Cloudevent from 'cloudevents-sdk/v1';
-
-export default interface IEventInterface<T extends Cloudevent> {
-  getId(): string|undefined;
-  getType(): string|undefined;
-  getData(): any;
-  getTime(): Date;
-  format(): T;
+export default interface IEventInterface {
+  id: string;
+  type: string;
+  data: any;
+  time: string | Date;
+  toJSON(): { [s: string]: any };
 }

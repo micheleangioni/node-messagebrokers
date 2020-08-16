@@ -1,4 +1,4 @@
-import Cloudevent, { event } from 'cloudevents-sdk/v1';
+import {CloudEvent, Version} from 'cloudevents';
 import uuidv4 from 'uuid/v4';
 import { CreateEventV1Options } from './declarations';
 
@@ -9,28 +9,22 @@ export default class CloudEventFactory {
     source: string,
     data: any,
     options: CreateEventV1Options = {},
-  ): Cloudevent {
+  ): CloudEvent {
+    const type = CloudEventFactory.getEventType(aggregate, eventType);
+
     const specOptions = CloudEventFactory.mergeOptionsWithDefaults(options);
-    const cloudevent: Cloudevent = event();
 
-    if (specOptions.datacontenttype) {
-      cloudevent.dataContentType(specOptions.datacontenttype);
-    }
-
-    if (specOptions.dataschema) {
-      cloudevent.dataschema(specOptions.dataschema);
-    }
-
-    if (specOptions.subject) {
-      cloudevent.subject(specOptions.subject);
-    }
-
-    return cloudevent
-      .type(CloudEventFactory.getEventType(aggregate, eventType))
-      .source(source)
-      .id(uuidv4())
-      .time(new Date())
-      .data(data);
+    return new CloudEvent({
+      data,
+      id: (uuidv4 as () => string)(),
+      source,
+      specversion: Version.V1,
+      time: new Date(),
+      type,
+      ...(specOptions.datacontenttype && { datacontenttype: specOptions.datacontenttype }),
+      ...(specOptions.dataschema && { dataschema: specOptions.dataschema }),
+      ...(specOptions.subject && { subject: specOptions.subject }),
+    });
   }
 
   private static readonly defaultOptions = {

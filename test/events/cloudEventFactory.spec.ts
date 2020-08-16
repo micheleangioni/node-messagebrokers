@@ -21,14 +21,14 @@ describe('Testing the CloudEventFactory', () => {
       dataschema,
       subject,
     });
-    const payload = event.format();
+    const payload = event.toJSON();
     const expectedType = `${process.env.REVERSE_DNS}.${aggregate}.${eventType}`;
 
-    expect(event.getSpecversion()).toBe('1.0');
-    expect(event.getType()).toBe(expectedType);
-    expect(event.getSource()).toBe(source);
-    expect(event.getData()).toBe(playerData);
-    expect(event.getDataschema()).toBe(dataschema);
+    expect(event.specversion).toBe('1.0');
+    expect(event.type).toBe(expectedType);
+    expect(event.source).toBe(source);
+    expect(event.data).toBe(playerData);
+    expect(event.dataschema).toBe(dataschema);
 
     expect(payload.specversion).toBe('1.0');
     expect(payload.source).toBe(source);
