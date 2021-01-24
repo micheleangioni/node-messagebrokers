@@ -40,7 +40,7 @@ describe('Testing the KafkaJsBrokerAdapter', () => {
         user: {
           // eslint-disable-next-line @typescript-eslint/require-await
           handler: async (message: KafkaMessage) => {
-            const eventPayload = JSON.parse(message.value.toString());
+            const eventPayload = JSON.parse(message.value?.toString() ?? '');
             expect(eventPayload.data).toEqual(data);
             done();
           },
@@ -83,7 +83,7 @@ describe('Testing the KafkaJsBrokerAdapter', () => {
         user: {
           // eslint-disable-next-line @typescript-eslint/require-await
           handler: async (message: KafkaMessage) => {
-            const eventPayload = JSON.parse(message.value.toString());
+            const eventPayload = JSON.parse(message.value?.toString() ?? '');
             expect(eventPayload.data).toEqual(data);
             done();
           },

@@ -50,7 +50,7 @@
   "dependencies": {
     "aws-sdk": "^2.734.0",
     "cloudevents": "^3.0.1",
-    "kafkajs": "^1.12.0",
+    "kafkajs": "^1.15.0",
     "uuid": "^8.3.0"
   },
   "devDependencies": {
