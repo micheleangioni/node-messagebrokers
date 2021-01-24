@@ -19,7 +19,7 @@ export default class CloudEventFactory {
       id: (uuidv4 as () => string)(),
       source,
       specversion: Version.V1,
-      time: new Date(),
+      time: new Date().toISOString(),
       type,
       ...(specOptions.datacontenttype && { datacontenttype: specOptions.datacontenttype }),
       ...(specOptions.dataschema && { dataschema: specOptions.dataschema }),

@@ -2,6 +2,6 @@ export default interface IEventInterface {
   id: string;
   type: string;
   data: any;
-  time: string | Date;
+  time?: string;
   toJSON(): { [s: string]: any };
 }

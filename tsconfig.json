@@ -10,7 +10,8 @@
     "resolveJsonModule": true,
     "moduleResolution": "node",
     "lib":["es2018"],
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "skipLibCheck": true
   },
   "include": [
     "src/**/*.ts"
