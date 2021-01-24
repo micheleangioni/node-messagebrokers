@@ -1,3 +1,4 @@
+/* eslint-disable no-shadow */
 import {SubscriptionAttributesMap} from 'aws-sdk/clients/sns';
 import {KafkaMessage} from 'kafkajs';
 
@@ -14,8 +15,10 @@ export type TopicsHandlers = {
 };
 
 export type KafkaJsTopic = {
+  // eslint-disable-next-line @typescript-eslint/ban-types
   configEntries?: object[];
   numPartitions?: number;
+  // eslint-disable-next-line @typescript-eslint/ban-types
   replicaAssignment?: object[];
   replicationFactor?: number;
   topic: string;
@@ -26,8 +29,10 @@ export type KafkaJsTopics = {
 };
 
 export type KafkaTopic = {
+  // eslint-disable-next-line @typescript-eslint/ban-types
   configEntries?: object[];
   numPartitions?: number;
+  // eslint-disable-next-line @typescript-eslint/ban-types
   replicaAssignment?: object[];
   replicationFactor?: number;
   topic: string;
@@ -80,7 +85,7 @@ export type SendMessageOptions = {
 };
 
 export type MessageErrorData = {
-  data?: any;
+  data?: Record<string, unknown>;
   err: any;
   message: string;
   type?: string;

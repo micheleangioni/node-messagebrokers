@@ -7,7 +7,7 @@ export default class CloudEventFactory {
     aggregate: string,
     eventType: string,
     source: string,
-    data: any,
+    data: Record<string, unknown>,
     options: CreateEventV1Options = {},
   ): CloudEvent {
     const type = CloudEventFactory.getEventType(aggregate, eventType);

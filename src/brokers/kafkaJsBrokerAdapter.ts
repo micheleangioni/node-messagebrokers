@@ -64,7 +64,7 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
     this.producer = await this.createProducer({ partitionerFunction: this.partitionerFunction });
     await this.createTopics();
 
-    super.init();
+    await super.init();
 
     return true;
   }
@@ -208,6 +208,7 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
     const producerOptions: ProducerConfig = {};
 
     producerOptions.createPartitioner = partitionerFunction
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       ? () => partitionerFunction
       : Partitioners.JavaCompatiblePartitioner;
 

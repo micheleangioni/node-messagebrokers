@@ -36,7 +36,7 @@ export default class SnsBrokerAdapter extends BrokerInterface implements IBroker
 
     await this.createTopics();
 
-    super.init();
+    await super.init();
 
     return true;
   }

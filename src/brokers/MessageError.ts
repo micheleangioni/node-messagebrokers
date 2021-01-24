@@ -1,7 +1,7 @@
 import { MessageErrorData } from './declarations';
 
 export class MessageError extends Error {
-  public data?: any;
+  public data?: Record<string, unknown>;
   public err: any;
   public message: string;
   public type?: string;
@@ -10,6 +10,7 @@ export class MessageError extends Error {
     super(message);
 
     this.data = data;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     this.err = err;
     this.message = message;
     this.name = this.constructor.name;

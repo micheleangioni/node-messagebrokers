@@ -3,6 +3,7 @@ import IBrokerInterface from './IBrokerInterface';
 import KafkaJsAdapter from './kafkaJsBrokerAdapter';
 import SnsBrokerAdapter from './snsBrokerAdapter';
 
+// eslint-disable-next-line no-shadow
 enum Clients {
   KAFKAJS = 'kafkajs',
   SNS = 'awssns',
