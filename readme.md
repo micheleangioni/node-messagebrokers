@@ -4,8 +4,10 @@
 [![Build Status](https://api.travis-ci.org/micheleangioni/node-messagebrokers.svg?branch=master)](https://travis-ci.org/micheleangioni/node-messagebrokers)
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](https://lbesson.mit-license.org/)
 
+![](https://github.com/actions/hello-world/workflows/Greet%20Everyone/badge.svg?branch=master)
+
 > High level library which abstracts low level Message Brokers clients 
-> and enforces the [clouevents](https://cloudevents.io/) standard for the event payload.
+> and enforces the [Clouevents](https://cloudevents.io/) standard for the event payload.
 
 **Library still in Beta version and in development**
 
