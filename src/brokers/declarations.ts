@@ -14,11 +14,11 @@ export type TopicsHandlers = {
 };
 
 export type KafkaJsTopic = {
-  topic: string;
-  numPartitions?: number;
-  replicationFactor?: number;
-  replicaAssignment?: object[];
   configEntries?: object[];
+  numPartitions?: number;
+  replicaAssignment?: object[];
+  replicationFactor?: number;
+  topic: string;
 };
 
 export type KafkaJsTopics = {
@@ -26,11 +26,11 @@ export type KafkaJsTopics = {
 };
 
 export type KafkaTopic = {
-  topic: string;
-  numPartitions?: number;
-  replicationFactor?: number;
-  replicaAssignment?: object[];
   configEntries?: object[];
+  numPartitions?: number;
+  replicaAssignment?: object[];
+  replicationFactor?: number;
+  topic: string;
 };
 
 export type KafkaTopics = {
@@ -56,8 +56,8 @@ export type KafkaJsOptions = {
 };
 
 export type AggregateConsumerConf = {
-  handler: (message: KafkaMessage) => Promise<void>;
   fromBeginning?: boolean;
+  handler: (message: KafkaMessage) => Promise<void>;
   topic: string;
 };
 
@@ -97,14 +97,14 @@ export type SnsOptions = {
 };
 
 export enum SnsProtocol {
+  APPLICATION = 'application',
   EMAIL = 'email',
   EMAIL_JSON = 'email-json',
   HTTP = 'http',
   HTTPS = 'https',
+  LAMBDA = 'lambda',
   SMS = 'sms',
   SQS = 'sqs',
-  APPLICATION = 'application',
-  LAMBDA = 'lambda',
 }
 
 export type SnsConsumerOptions = {

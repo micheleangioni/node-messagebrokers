@@ -140,6 +140,7 @@
             }
         ],
         "spaced-comment": "error",
+        "sort-keys": "error",
         "valid-typeof": "off"
     }
 }
