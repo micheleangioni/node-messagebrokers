@@ -42,7 +42,7 @@ describe('Testing the SnsBrokerAdapter', () => {
       username: 'Voodoo',
     };
 
-    const broker = new SnsBrokerAdapter({ endpoint: 'http://localhost:4575', region: 'eu-central-1', topics });
+    const broker = new SnsBrokerAdapter({ endpoint: 'http://localhost:4566', region: 'eu-central-1', topics });
     await broker.init({
       accessKeyId: 'dummyAccessKeyId',
       secretAccessKey: 'dummySecretAccessKey',
