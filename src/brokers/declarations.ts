@@ -1,6 +1,10 @@
 /* eslint-disable no-shadow */
-import {ClientConfiguration, SubscriptionAttributesMap} from 'aws-sdk/clients/sns';
+import {ClientConfiguration as AwsSnsClientConfiguration, SubscriptionAttributesMap} from 'aws-sdk/clients/sns';
 import {ConsumerConfig, KafkaMessage} from 'kafkajs';
+
+export type ClientConfiguration = Record<string, any> & {
+  createTopics?: boolean;
+};
 
 export type SslOptions = {
   ca?: string[];
@@ -105,7 +109,7 @@ export type SnsOptions = {
   topics: KafkaTopics;
 };
 
-export type SnsClientConfiguration = ClientConfiguration & {
+export type SnsClientConfiguration = AwsSnsClientConfiguration & {
   createTopics?: boolean;
 };
 

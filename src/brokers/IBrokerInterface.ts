@@ -1,7 +1,8 @@
 import IEventInterface from '../events/IEventInterface';
+import {ClientConfiguration} from './declarations';
 
 export default interface IBrokerInterface {
-  init(clientOptions?: any, producerOptions?: any): Promise<true>;
+  init(clientConfiguration?: ClientConfiguration): Promise<true>;
   addConsumer(
     aggregate: string|string[],
     consumerConfig: any,
