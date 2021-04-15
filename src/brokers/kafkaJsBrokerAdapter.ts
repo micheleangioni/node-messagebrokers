@@ -16,6 +16,7 @@ import {
 } from 'kafkajs';
 import BrokerInterface from './abstractMessageBroker';
 import {
+  KafkaJsClientConfiguration,
   KafkaJsConsumerConfig,
   KafkaJsOptions,
   KafkaJsTopics,
@@ -59,10 +60,13 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
     this.topics = topics;
   }
 
-  public async init(consumerOptions?: ConsumerConfig): Promise<true> {
+  public async init(consumerOptions?: KafkaJsClientConfiguration): Promise<true> {
     this.client = await this.createConsumerClient(consumerOptions);
     this.producer = await this.createProducer({ partitionerFunction: this.partitionerFunction });
-    await this.createTopics();
+
+    if (consumerOptions?.createTopics) {
+      await this.createTopics();
+    }
 
     await super.init();
 

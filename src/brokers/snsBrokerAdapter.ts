@@ -1,10 +1,11 @@
 import AWS, {AWSError, SNS} from 'aws-sdk';
-import {ClientConfiguration, CreateTopicResponse, PublishResponse, SubscribeResponse} from 'aws-sdk/clients/sns';
+import {CreateTopicResponse, PublishResponse, SubscribeResponse} from 'aws-sdk/clients/sns';
 import IEventInterface from '../events/IEventInterface';
 import BrokerInterface from './abstractMessageBroker';
 import {
   AggregatesTopicArns,
   KafkaTopics,
+  SnsClientConfiguration,
   SnsConsumerOptions,
   SnsOptions,
 } from './declarations';
@@ -26,7 +27,7 @@ export default class SnsBrokerAdapter extends BrokerInterface implements IBroker
     this.topics = topics;
   }
 
-  public async init(initConfigurations?: ClientConfiguration): Promise<true> {
+  public async init(initConfigurations?: SnsClientConfiguration): Promise<true> {
     this.sns = new AWS.SNS({
       apiVersion: '2010-03-31',
       ...(this.endpoint && { endpoint: this.endpoint }),
@@ -34,7 +35,9 @@ export default class SnsBrokerAdapter extends BrokerInterface implements IBroker
       ...initConfigurations,
     });
 
-    await this.createTopics();
+    if (initConfigurations?.createTopics) {
+      await this.createTopics();
+    }
 
     await super.init();
 

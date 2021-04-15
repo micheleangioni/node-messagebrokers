@@ -1,6 +1,6 @@
 /* eslint-disable no-shadow */
-import {SubscriptionAttributesMap} from 'aws-sdk/clients/sns';
-import {KafkaMessage} from 'kafkajs';
+import {ClientConfiguration, SubscriptionAttributesMap} from 'aws-sdk/clients/sns';
+import {ConsumerConfig, KafkaMessage} from 'kafkajs';
 
 export type SslOptions = {
   ca?: string[];
@@ -60,6 +60,10 @@ export type KafkaJsOptions = {
   topics: KafkaTopics;
 };
 
+export type KafkaJsClientConfiguration = ConsumerConfig & {
+  createTopics?: boolean;
+};
+
 export type AggregateConsumerConf = {
   fromBeginning?: boolean;
   handler: (message: KafkaMessage) => Promise<void>;
@@ -99,6 +103,10 @@ export type SnsOptions = {
   endpoint?: string;
   region?: string;
   topics: KafkaTopics;
+};
+
+export type SnsClientConfiguration = ClientConfiguration & {
+  createTopics?: boolean;
 };
 
 export enum SnsProtocol {
