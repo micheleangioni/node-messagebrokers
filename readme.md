@@ -7,7 +7,7 @@
 ![](https://github.com/actions/hello-world/workflows/Greet%20Everyone/badge.svg?branch=master)
 
 > High level library which abstracts low level Message Brokers clients 
-> and enforces the [Clouevents](https://cloudevents.io/) standard for the event payload.
+> and enforces the [Cloudevents](https://cloudevents.io/) standard for the event payload.
 
 **Library still in Beta version and in development**
 
