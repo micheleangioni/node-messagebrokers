@@ -2,6 +2,10 @@
 import {ClientConfiguration as AwsSnsClientConfiguration, SubscriptionAttributesMap} from 'aws-sdk/clients/sns';
 import {ConsumerConfig, KafkaMessage} from 'kafkajs';
 
+export type BrokerOptions = {
+  awsAccountId?: string;
+};
+
 export type ClientConfiguration = Record<string, any> & {
   createTopics?: boolean;
 };
@@ -104,6 +108,7 @@ export type AggregatesTopicArns = {
 };
 
 export type SnsOptions = {
+  awsAccountId?: string;
   endpoint?: string;
   region?: string;
   topics: KafkaTopics;

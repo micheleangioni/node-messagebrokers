@@ -1,5 +1,5 @@
 import IBrokerInterface from './brokers/IBrokerInterface';
-import brokerFactory from './brokers/messageBroker';
+import brokerFactory from './brokers/brokerFactory';
 import CloudEventFactory from './events/cloudEventFactory';
 
 // Make some classes nicer to import

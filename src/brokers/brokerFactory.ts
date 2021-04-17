@@ -1,4 +1,4 @@
-import {KafkaTopics, SslOptions} from './declarations';
+import {BrokerOptions, KafkaTopics, SslOptions} from './declarations';
 import IBrokerInterface from './IBrokerInterface';
 import KafkaJsAdapter from './kafkaJsBrokerAdapter';
 import SnsBrokerAdapter from './snsBrokerAdapter';
@@ -34,7 +34,7 @@ const getKafkaBrokerList = (): string[] => {
     : ['localhost:9092'];
 };
 
-export default (topics: KafkaTopics) => {
+export default (topics: KafkaTopics, {awsAccountId}: BrokerOptions) => {
   const sslOptions = getSSLConfiguration();
 
   let messageBroker: IBrokerInterface;
@@ -53,6 +53,7 @@ export default (topics: KafkaTopics) => {
         region: process.env.AWS_REGION || 'eu-west-1',
         topics,
         ...(process.env.SNS_ENDPOINT && { endpoint: process.env.SNS_ENDPOINT }),
+        ...(awsAccountId && { awsAccountId }),
       });
       break;
     }

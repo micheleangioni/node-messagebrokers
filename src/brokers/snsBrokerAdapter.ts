@@ -1,5 +1,5 @@
 import AWS, {AWSError, SNS} from 'aws-sdk';
-import {CreateTopicResponse, PublishResponse, SubscribeResponse} from 'aws-sdk/clients/sns';
+import {CreateTopicResponse, ListTopicsResponse, PublishResponse, SubscribeResponse} from 'aws-sdk/clients/sns';
 import IEventInterface from '../events/IEventInterface';
 import BrokerInterface from './abstractMessageBroker';
 import {
@@ -13,15 +13,17 @@ import IBrokerInterface from './IBrokerInterface';
 
 export default class SnsBrokerAdapter extends BrokerInterface implements IBrokerInterface {
   public initialised: boolean = false;
+  private awsAccountId?: string;
   private endpoint?: string;
   private region?: string;
   private sns?: SNS;
   private topics: KafkaTopics;
   private topicDescriptions: AggregatesTopicArns = {};
 
-  constructor({ endpoint, region, topics }: SnsOptions) {
+  constructor({ awsAccountId, endpoint, region, topics }: SnsOptions) {
     super();
 
+    this.awsAccountId = awsAccountId;
     this.endpoint = endpoint;
     this.region = region;
     this.topics = topics;
@@ -37,6 +39,8 @@ export default class SnsBrokerAdapter extends BrokerInterface implements IBroker
 
     if (initConfigurations?.createTopics) {
       await this.createTopics();
+    } else {
+      await this.setTopicArns();
     }
 
     await super.init();
@@ -147,5 +151,50 @@ export default class SnsBrokerAdapter extends BrokerInterface implements IBroker
         resolve(data);
       });
     }));
+  }
+
+  private setTopicArns() {
+    const awsAccountId = this.awsAccountId;
+    const region = this.region;
+
+    // If awsAccountId and region are provided, we can rebuild the ARNs without having to query AWS
+    if (awsAccountId && region) {
+      Object.keys(this.topics).forEach((aggregate) => {
+        const topicName = this.topics[aggregate].topic;
+
+        this.topicDescriptions[aggregate] = `arn:aws:sns:${region}:${awsAccountId}:${topicName}`;
+      });
+    } else {
+      return new Promise<undefined>(((resolve, reject) => {
+        // Fetch all the topics from AWS
+        (this.sns as SNS).listTopics((err: AWSError, {Topics}: ListTopicsResponse) => {
+          if (err) { return reject(err); }
+
+          // Create an inverse map topicName => aggregate
+          const nameAggregateMap = Object.keys(this.topics).reduce((map: Record<string, string>, aggregate) => {
+            const topicName = this.topics[aggregate].topic;
+            map[topicName] = aggregate;
+
+            return map;
+          }, {});
+
+          const aggregateTopicNames = Object.values(this.topics).map(({topic}) => topic);
+
+          // Loop over the fetched list of Topics
+          Topics?.forEach(({TopicArn}) => {
+            if (!TopicArn) return;
+
+            const arnPieces = TopicArn?.split(':');
+            const topicName = arnPieces[arnPieces.length - 1];
+
+            if (aggregateTopicNames.includes(topicName)) {
+              this.topicDescriptions[nameAggregateMap[topicName]] = TopicArn;
+            }
+
+            resolve(undefined);
+          });
+        });
+      }));
+    }
   }
 }
