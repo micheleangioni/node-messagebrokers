@@ -173,10 +173,12 @@ const broker = brokerFactory({
 });
 ```
 
+If the topics don't exist yet, provide also the `createTopics: true` during the initialization.
+
 **Initialization**
 
 ```js
-await broker.init(consumerConfig);
+await broker.init(kafkaJsClientConfiguration);
 ```
 
 where `consumerConfig` has the following signature:
@@ -205,6 +207,10 @@ interface ConsumerConfig {
   maxInFlightRequests?: number
   readUncommitted?: boolean
 }
+
+type KafkaJsClientConfiguration = ConsumerConfig & {
+  createTopics?: boolean;
+};
 ```
 
 Simple example
@@ -331,6 +337,26 @@ const broker = brokerFactory({
 });
 ```
 
+If the topics don't exist yet, provide also the `createTopics: true` key during the initialization (next paragraph).
+This requires of course the `sns:CreateTopic` permission.
+
+When connecting to AWS the client needs to fetch the ARNs list of input topics. 
+By default, it performs a `listTopics` call to SNS and therefore the `sns:ListTopic` permission is needed.
+
+There are 2 possibilities to improve the performances and avoid a lookup over all existing topics:
+
+1. The account has the `sns:CreateTopic` permission. In this case, provide the `createTopics: true` key during initialization even if the topics have already been created
+
+2. Pass the AWS Account Id in order to re-build the topics ARNs without having to query AWS
+```js
+const broker = brokerFactory({
+  awsAccountId: '1234567890',
+  endpoint: 'http://localhost:4575', 
+  region: 'eu-central-1', 
+  topics
+});
+```
+
 **Initialization**
 
 ```js
@@ -339,6 +365,8 @@ await broker.init(initConfigurations);
 
 where `initConfigurations` is optional and has the same structure of the 
 [options constructor parameter of the official SDK](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/SNS.html#constructor-property).
+
+plus the optional `createTopics: boolean` key. 
 
 Simple example:
 
