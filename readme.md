@@ -102,9 +102,9 @@ export type CreateEventV1Options = {
 
 ## <a name="usage"></a>Usage
 
-**Instantiating a Client**
+**Instantiating the Client**
 
-Instantiation is the same for all clients.
+Instantiation is similar for all clients.
 In order to create an instance, it's enough to provide the topic list when using the client factory:
 
 ```js
@@ -118,7 +118,7 @@ const topics = {
   }
 };
 
-const broker = brokerFactory({ topics });
+const broker = brokerFactory(topics);
 ```
 
 The `topics` parameter must follow the following type definition:
@@ -151,13 +151,6 @@ Due to some particularity of each client, the brokers' `init()` methods have dif
 ```js
 import brokerFactory from '@micheleangioni/node-messagebrokers';
 
-// SSL certificate
-const sslOptions = {
-  ca: '', // TODO To be set
-  cert: '', // TODO To be set
-  key: '' // TODO To be set
-};
-
 const topics = {
   user: {
     topic: 'myCompany.events.identity.user',
@@ -166,11 +159,7 @@ const topics = {
   }
 };
 
-const broker = brokerFactory({ 
-  clientId: 'my-app',
-  sslOptions,
-  topics
-});
+const broker = brokerFactory(topics);
 ```
 
 If the topics don't exist yet, provide also the `createTopics: true` during the initialization.
@@ -217,6 +206,12 @@ Simple example
 
 ```js
 await broker.init({ groupId: 'my-consumer-group-id' });
+```
+
+Creating also the topics during the initialization
+
+```js
+await broker.init({ createTopics: true, groupId: 'my-consumer-group-id' });
 ```
 
 **Creating a Consumer**
@@ -330,11 +325,7 @@ await broker.sendMessage(
 ```js
 import brokerFactory from '@micheleangioni/node-messagebrokers';
 
-const broker = brokerFactory({ 
-  endpoint: 'http://localhost:4575', 
-  region: 'eu-central-1', 
-  topics
-});
+const broker = brokerFactory(topics);
 ```
 
 If the topics don't exist yet, provide also the `createTopics: true` key during the initialization (next paragraph).
@@ -349,12 +340,7 @@ There are 2 possibilities to improve the performances and avoid a lookup over al
 
 2. Pass the AWS Account Id in order to re-build the topics ARNs without having to query AWS
 ```js
-const broker = brokerFactory({
-  awsAccountId: '1234567890',
-  endpoint: 'http://localhost:4575', 
-  region: 'eu-central-1', 
-  topics
-});
+const broker = brokerFactory(topics, { awsAccountId: '1234567890' });
 ```
 
 **Initialization**
@@ -372,6 +358,12 @@ Simple example:
 
 ```js
 await broker.init();
+```
+
+Creating also the topics during the initialization
+
+```js
+await broker.init({ createTopics: true });
 ```
 
 **Adding a Consumer**
