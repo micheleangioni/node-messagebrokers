@@ -190,9 +190,9 @@ export default class SnsBrokerAdapter extends BrokerInterface implements IBroker
             if (aggregateTopicNames.includes(topicName)) {
               this.topicDescriptions[nameAggregateMap[topicName]] = TopicArn;
             }
-
-            resolve(undefined);
           });
+
+          resolve(undefined);
         });
       }));
     }
