@@ -28,16 +28,16 @@ import IBrokerInterface from './IBrokerInterface';
 import IEventInterface from '../events/IEventInterface';
 
 export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBrokerInterface {
+  private static isKafkaLogLevelValid(inputLogLevel?: logLevel | string): inputLogLevel is logLevel {
+    return Object.values(logLevel).includes(inputLogLevel as logLevel);
+  }
+
   public initialised: boolean = false;
   private client?: Consumer;
   private readonly kafka: Kafka;
   private readonly partitionerFunction?: Partitioner;
   private producer?: Producer;
-  private topics: KafkaJsTopics;
-
-  private static isKafkaLogLevelValid(inputLogLevel?: logLevel | string): inputLogLevel is logLevel {
-    return Object.values(logLevel).includes(inputLogLevel as logLevel);
-  }
+  private readonly topics: KafkaJsTopics;
 
   constructor(brokers: string[], { clientId, partitionerFunction, sslOptions, topics }: KafkaJsOptions) {
     super();
@@ -164,31 +164,6 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
     return (this.producer as Producer).send(this._createEventPayload(aggregate, events, partitionKey));
   }
 
-  /**
-   * Create an event payload from some `cloudevents` complaint event instance.
-   * The same key will be used for all of them.
-   *
-   * @see https://github.com/cloudevents/spec/blob/v0.2/spec.md
-   * @param {string} aggregate
-   * @param {IEventInterface[]} cloudevents
-   * @param {string|undefined} key
-   * @return {object}
-   */
-  public _createEventPayload(aggregate: string, cloudevents: IEventInterface[], key?: string): ProducerRecord {
-    const topic = this.topics[aggregate] ?
-      this.topics[aggregate].topic :
-      undefined;
-
-    if (!topic) {
-      throw new Error(`No topic for aggregate: ${aggregate}`);
-    }
-
-    return {
-      messages: cloudevents.map((cloudevent: any) => this.createEventMessage(cloudevent, key)),
-      topic,
-    };
-  }
-
   private createEventMessage(cloudevent: IEventInterface, key?: string): Message {
     return {
       key,
@@ -246,11 +221,36 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
     return true;
   }
 
-  private async processMessage(topicsHandlers: TopicsHandlers, topic: string, message: KafkaMessage ) {
+  private async processMessage(topicsHandlers: TopicsHandlers, topic: string, message: KafkaMessage) {
     if (!topicsHandlers[topic] || !topicsHandlers[topic].handler) {
       return;
     }
 
     await topicsHandlers[topic].handler(message);
+  }
+
+  /**
+   * Create an event payload from some `cloudevents` complaint event instance.
+   * The same key will be used for all of them.
+   *
+   * @see https://github.com/cloudevents/spec/blob/v0.2/spec.md
+   * @param {string} aggregate
+   * @param {IEventInterface[]} cloudevents
+   * @param {string|undefined} key
+   * @return {ProducerRecord}
+   */
+  public _createEventPayload(aggregate: string, cloudevents: IEventInterface[], key?: string): ProducerRecord {
+    const topic = this.topics[aggregate] ?
+      this.topics[aggregate].topic :
+      undefined;
+
+    if (!topic) {
+      throw new Error(`No topic for aggregate: ${aggregate}`);
+    }
+
+    return {
+      messages: cloudevents.map((cloudevent: any) => this.createEventMessage(cloudevent, key)),
+      topic,
+    };
   }
 }

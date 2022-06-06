@@ -3,6 +3,10 @@ import {v4 as uuidv4} from 'uuid';
 import { CreateEventV1Options } from './declarations';
 
 export default class CloudEventFactory {
+  private static readonly defaultOptions = {
+    datacontenttype: 'application/json',
+  };
+
   public static createV1(
     aggregate: string,
     eventType: string,
@@ -26,10 +30,6 @@ export default class CloudEventFactory {
       ...(specOptions.subject && { subject: specOptions.subject }),
     });
   }
-
-  private static readonly defaultOptions = {
-    datacontenttype: 'application/json',
-  };
 
   private static mergeOptionsWithDefaults<T>(options: T): T {
     return { ...CloudEventFactory.defaultOptions, ...options };
