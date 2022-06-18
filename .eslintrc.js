@@ -8,7 +8,7 @@ module.exports = {
   extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaVersion: 'es2020',
+    project: 'tsconfig.eslint.json',
     sourceType: 'module',
   },
   plugins: ['@typescript-eslint', 'prefer-arrow', 'sort-class-members'],
