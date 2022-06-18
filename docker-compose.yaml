@@ -2,7 +2,7 @@ version: '3.5'
 services:
 
   zookeeper:
-    image: zookeeper
+    image: zookeeper:3.5.5
     restart: always
     hostname: zookeeper
     ports:
@@ -12,26 +12,32 @@ services:
       ZOO_SERVERS: server.1=0.0.0.0:2888:3888;2181
 
   kafka:
-    image: 'wurstmeister/kafka'
+    image: wurstmeister/kafka:2.12-2.5.0
     depends_on:
       - zookeeper
     ports:
       - '9092:9092'
+    expose:
+      - "9093"
     environment:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_HOST_NAME: localhost
 
   localstack:
-    image: localstack/localstack:0.12.9
+    image: localstack/localstack:0.14.3
     ports:
-      - "4566-4599:4566-4599"
+#      - "53:53" // Commented out as failing in GitHub actions
+      - "443:443"
+      - "4510-4559:4510-4559"
+      - "4566:4566"
       - "${PORT_WEB_UI-8080}:${PORT_WEB_UI-8080}"
     environment:
       - DEBUG=1
-      - LAMBDA_EXECUTOR=docker
+      - LAMBDA_EXECUTOR=docker-reuse # see https://docs.localstack.cloud/localstack/configuration/
       - DATA_DIR=/tmp/localstack2
       - DOCKER_HOST=unix:///var/run/docker.sock
-      - SERVICES=sns
+      - LAMBDA_DOCKER_NETWORK=sls-node-ts
+      # - LS_LOG=trace # Specify the log level ('trace', 'debug', 'info', 'warn', 'error', 'warning')
     volumes:
       - "${TMPDIR:-/tmp/localstack2}:/tmp/localstack2"
       - /var/run/docker.sock:/var/run/docker.sock
