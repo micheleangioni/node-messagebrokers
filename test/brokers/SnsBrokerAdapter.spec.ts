@@ -38,7 +38,7 @@ describe('Testing the SnsBrokerAdapter', () => {
 
     it('correctly creates a consumer and sends an event when creating a Topic', (done) => {
       const getPath = '/sns';
-      const consumerUrl = `http://host.docker.internal:3050${getPath}`;
+      const consumerUrl = `http://${getConsumerHost()}:3050${getPath}`;
       const aggregate = 'user';
       const eventType = 'UserCreated';
       const data = {
@@ -121,7 +121,7 @@ describe('Testing the SnsBrokerAdapter', () => {
       'correctly creates a consumer and sends an event when not creating a Topic and providing the awsAccountId',
       (done) => {
         const getPath = '/sns';
-        const consumerUrl = `http://host.docker.internal:3050${getPath}`;
+        const consumerUrl = `http://${getConsumerHost()}:3050${getPath}`;
         const aggregate = 'user';
         const eventType = 'UserCreated';
         const data = {
@@ -170,7 +170,7 @@ describe('Testing the SnsBrokerAdapter', () => {
       'correctly creates a consumer and sends an event when not creating a Topic and without awsAccountId',
       (done) => {
         const getPath = '/sns';
-        const consumerUrl = `http://host.docker.internal:3050${getPath}`;
+        const consumerUrl = `http://${getConsumerHost()}:3050${getPath}`;
         const aggregate = 'user';
         const eventType = 'UserCreated';
         const data = {
@@ -215,3 +215,8 @@ describe('Testing the SnsBrokerAdapter', () => {
       });
   });
 });
+
+const getConsumerHost = () => process.env.NODE_ENV === 'ci'
+  ? '172.17.0.1'
+  : '${getConsumerHost()}';
+

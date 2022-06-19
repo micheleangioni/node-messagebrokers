@@ -19,6 +19,7 @@
     "build": "npm run lint && rm -rf ./build && tsc --strictNullChecks",
     "lint": "tsc --noEmit && eslint \"**/*.{js,ts}\"",
     "test": "jest --runInBand --forceExit --verbose",
+    "test-ci": "NODE_ENV=ci && npm run test",
     "prepublishOnly": "npm test && npm run lint",
     "prepare": "npm run build",
     "preversion": "npm run lint",

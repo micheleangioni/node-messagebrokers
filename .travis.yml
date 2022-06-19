@@ -6,13 +6,11 @@ node_js:
   - '10'
 
 install:
-  - docker exec ${runner.containerId} \
-    /bin/sh -c "ip -4 route list match 0/0 | awk '{print $3" host.docker.internal"}' >> /etc/hosts"
   - docker-compose up -d
   - npm install
 
 script:
-  - npm test
+  - npm test-ci
 
 env:
   global:
