@@ -13,6 +13,8 @@ const getSnsPath = '/sns';
 describe('Testing the SnsBrokerAdapter', () => {
   let server: Server;
 
+  console.log(`getConsumerHost is ${getConsumerHost} in ${process.env.NODE_ENV} env`);
+
   beforeEach( (done) => {
     server = http.createServer( (_, res) => {
       res.end();
