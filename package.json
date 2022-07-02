@@ -49,9 +49,9 @@
     "verbose": true
   },
   "dependencies": {
-    "aws-sdk": "^2.887.0",
+    "aws-sdk": "^2.1167.0",
     "cloudevents": "^4.0.1",
-    "kafkajs": "^1.15.0",
+    "kafkajs": "^2.1.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

@@ -36,7 +36,7 @@ for AWS SNS.
 
 ## <a name="requirements"></a>Requirements
 
-- Node.js v10+
+- Node.js v14+
 
 ## <a name="installation"></a>Installation
 

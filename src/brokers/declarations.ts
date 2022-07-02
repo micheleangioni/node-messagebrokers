@@ -22,25 +22,12 @@ export type TopicsHandlers = {
   };
 };
 
-export type KafkaJsTopic = {
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  configEntries?: object[];
-  numPartitions?: number;
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  replicaAssignment?: object[];
-  replicationFactor?: number;
-  topic: string;
-};
-
-export type KafkaJsTopics = {
-  [aggregate: string]: KafkaJsTopic;
-};
-
 export type KafkaTopic = {
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  configEntries?: object[];
+  configEntries?: {
+    name: string;
+    value: string;
+  }[];
   numPartitions?: number;
-  // eslint-disable-next-line @typescript-eslint/ban-types
   replicaAssignment?: object[];
   replicationFactor?: number;
   topic: string;
@@ -48,6 +35,12 @@ export type KafkaTopic = {
 
 export type KafkaTopics = {
   [aggregate: string]: KafkaTopic;
+};
+
+export type KafkaJsTopic = KafkaTopic;
+
+export type KafkaJsTopics = {
+  [aggregate: string]: KafkaJsTopic;
 };
 
 export type PartitionerParams = {

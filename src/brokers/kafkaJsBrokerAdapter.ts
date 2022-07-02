@@ -1,4 +1,5 @@
 import {
+  Admin,
   Consumer,
   ConsumerConfig,
   ConsumerRunConfig,
@@ -198,14 +199,13 @@ export default class KafkaJsBrokerAdapter extends BrokerInterface implements IBr
   }
 
   private async createTopics(): Promise<boolean> {
-    const adminClient = this.kafka.admin();
+    const adminClient: Admin = this.kafka.admin();
     await adminClient.connect();
 
     // Fetch existing topics and get the ones which need to be created
 
     const allTopics = Object.values(this.topics);
 
-    // @ts-ignore
     const existingTopicsMetadataList = (await adminClient.fetchTopicMetadata()).topics
       .map((topicMetadata: ITopicMetadata) => topicMetadata.name);
 
