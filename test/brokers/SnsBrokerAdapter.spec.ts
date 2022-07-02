@@ -49,8 +49,6 @@ describe('Testing the SnsBrokerAdapter', () => {
         username: 'Voodoo',
       };
 
-      console.log(consumerUrl);
-
       const broker = new SnsBrokerAdapter({
         awsAccountId: '000000000000',
         endpoint: 'http://localhost:4566',

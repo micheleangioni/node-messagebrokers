@@ -16,3 +16,4 @@ script:
 env:
   global:
     - KAFKA_LOG_LEVEL=5
+    - NODE_ENV=ci
