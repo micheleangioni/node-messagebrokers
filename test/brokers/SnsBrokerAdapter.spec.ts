@@ -6,9 +6,31 @@ import AWS from 'aws-sdk';
 
 AWS.config.region = 'eu-west-1';
 
-jest.setTimeout(15000); // eslint-disable-line
+jest.setTimeout(25000); // eslint-disable-line
+
+const getSnsPath = '/sns';
 
 describe('Testing the SnsBrokerAdapter', () => {
+  let server: Server;
+
+  beforeEach( (done) => {
+    server = http.createServer( (_, res) => {
+      res.end();
+    });
+
+    server.listen(3050, () => {
+      console.log('Server is running at 3050');
+      done();
+    });
+  });
+
+  afterEach( (done) => {
+    setTimeout(() => {
+      server.close();
+      done();
+    }, 100);
+  });
+
   const topics = {
     user: {
       topic: 'company_events_identity_user',
@@ -16,29 +38,8 @@ describe('Testing the SnsBrokerAdapter', () => {
   };
 
   describe('Testing also the Topic subscription', () => {
-    let server: Server;
-
-    beforeEach( (done) => {
-      server = http.createServer( (_, res) => {
-        res.end();
-      });
-
-      server.listen(3050, () => {
-        console.log('Server is running at 3050');
-        done();
-      });
-    });
-
-    afterEach( (done) => {
-      setTimeout(() => {
-        server.close();
-        done();
-      }, 100);
-    });
-
     it('correctly creates a consumer and sends an event when creating a Topic', (done) => {
-      const getPath = '/sns';
-      const consumerUrl = `http://${getConsumerHost()}:3050${getPath}`;
+      const consumerUrl = `http://${getConsumerHost()}:3050${getSnsPath}`;
       const aggregate = 'user';
       const eventType = 'UserCreated';
       const data = {
@@ -46,10 +47,13 @@ describe('Testing the SnsBrokerAdapter', () => {
         username: 'Voodoo',
       };
 
+      console.log(consumerUrl);
+
       const broker = new SnsBrokerAdapter({
+        awsAccountId: '000000000000',
         endpoint: 'http://localhost:4566',
         region: 'eu-west-1',
-        topics,
+        topics
       });
 
       broker.init({
@@ -58,40 +62,8 @@ describe('Testing the SnsBrokerAdapter', () => {
         secretAccessKey: 'dummySecretAccessKey',
       })
         .then(() => {
-          // Init complete
-
           // Add a request listener to the Server to consume the messages
-
-          server.addListener('request',  (req, res) => {
-            console.log('REQUEST', req);
-
-            const { method, url } = req;
-
-            if (method !== 'POST' || url !== getPath) { return res.end(); }
-
-            const rawBody: Uint8Array[] = [];
-            let body: string;
-
-            req.on('data', (chunk: Uint8Array) => {
-              rawBody.push(chunk);
-            }).on('end', () => {
-              body = Buffer.concat(rawBody).toString();
-
-              const message: any = JSON.parse(body);
-
-              try {
-                const payload = JSON.parse(message.Message);
-                expect(payload.type).toBe('user.UserCreated');
-              } catch (e) {
-                console.info(message.Message);
-                // SNS would require to visit the URL provided in the link to confirm the subscription
-                // However, receiving this message is enough to confirm the subscription is working fine
-              }
-
-              res.end();
-              done();
-            });
-          });
+          addListener(server, done);
 
           // Bind the Server to SNS to act as a consumer
           broker.addConsumer('user', { endpoint: consumerUrl, protocol: SnsProtocol.HTTP })
@@ -108,11 +80,9 @@ describe('Testing the SnsBrokerAdapter', () => {
               broker.sendMessage(aggregate, [cloudEvent])
                 .then((snsResponses) => {
                   expect(snsResponses[0].MessageId).not.toBeFalsy();
-
-                  // done();
                 })
-            })
-        })
+            });
+        });
     });
   });
 
@@ -143,6 +113,7 @@ describe('Testing the SnsBrokerAdapter', () => {
         })
           .then(() => {
             // Add a request listener to the Server to consume the messages
+            addListener(server, done);
 
             // Bind the Server to SNS to act as a consumer
             broker.addConsumer('user', { endpoint: consumerUrl, protocol: SnsProtocol.HTTP })
@@ -159,8 +130,6 @@ describe('Testing the SnsBrokerAdapter', () => {
                 broker.sendMessage(aggregate, [cloudEvent])
                   .then((snsResponses) => {
                     expect(snsResponses[0].MessageId).not.toBeFalsy();
-
-                    done();
                   })
               });
           });
@@ -191,6 +160,7 @@ describe('Testing the SnsBrokerAdapter', () => {
         })
           .then(() => {
             // Add a request listener to the Server to consume the messages
+            addListener(server, done);
 
             // Bind the Server to SNS to act as a consumer
             broker.addConsumer('user', { endpoint: consumerUrl, protocol: SnsProtocol.HTTP })
@@ -207,8 +177,6 @@ describe('Testing the SnsBrokerAdapter', () => {
                 broker.sendMessage(aggregate, [cloudEvent])
                   .then((snsResponses) => {
                     expect(snsResponses[0].MessageId).not.toBeFalsy();
-
-                    done();
                   });
               });
           });
@@ -216,7 +184,38 @@ describe('Testing the SnsBrokerAdapter', () => {
   });
 });
 
+const addListener = (server: http.Server, done: jest.DoneCallback) => {
+  server.addListener('request',  (req, res) => {
+    const { method, url } = req;
+
+    if (method !== 'POST' || url !== getSnsPath) { return res.end(); }
+
+    const rawBody: Uint8Array[] = [];
+    let body: string;
+
+    req.on('data', (chunk: Uint8Array) => {
+      rawBody.push(chunk);
+    }).on('end', () => {
+      body = Buffer.concat(rawBody).toString();
+
+      const message: any = JSON.parse(body);
+
+      try {
+        const payload = JSON.parse(message.Message);
+        expect(payload.type).toBe('user.UserCreated');
+      } catch (e) {
+        console.info(message.Message);
+        // SNS would require to visit the URL provided in the link to confirm the subscription
+        // However, receiving this message is enough to confirm the subscription is working fine
+      }
+
+      res.end();
+      done();
+    });
+  });
+}
+
 const getConsumerHost = () => process.env.NODE_ENV === 'ci'
   ? '172.17.0.1'
-  : '${getConsumerHost()}';
+  : 'host.docker.internal';
 
