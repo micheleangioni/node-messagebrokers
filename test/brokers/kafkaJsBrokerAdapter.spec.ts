@@ -59,7 +59,7 @@ describe('Testing the KafkaJsBrokerAdapter', () => {
 
               setTimeout(async () => {
                 await broker.sendMessage(aggregate, [cloudEvent]);
-              }, 1000)
+              }, 2000)
             })
         })
     });
@@ -109,7 +109,7 @@ describe('Testing the KafkaJsBrokerAdapter', () => {
 
               setTimeout(async () => {
                 await broker.sendMessage(aggregate, [cloudEvent]);
-              }, 1000)
+              }, 2000)
             })
         });
     });
