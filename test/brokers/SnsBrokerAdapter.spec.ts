@@ -13,8 +13,6 @@ const getSnsPath = '/sns';
 describe('Testing the SnsBrokerAdapter', () => {
   let server: Server;
 
-  console.log(`getConsumerHost is ${getConsumerHost} in ${process.env.NODE_ENV} env`);
-
   beforeEach( (done) => {
     server = http.createServer( (_, res) => {
       res.end();
@@ -41,6 +39,8 @@ describe('Testing the SnsBrokerAdapter', () => {
 
   describe('Testing also the Topic subscription', () => {
     it('correctly creates a consumer and sends an event when creating a Topic', (done) => {
+      console.log(`getConsumerHost is ${getConsumerHost()} in ${process.env.NODE_ENV} env`);
+
       const consumerUrl = `http://${getConsumerHost()}:3050${getSnsPath}`;
       const aggregate = 'user';
       const eventType = 'UserCreated';
