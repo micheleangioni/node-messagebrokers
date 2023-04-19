@@ -2,12 +2,12 @@
   "compilerOptions": {
     // Project options
     "allowJs": true, // Allow JavaScript files to be imported inside your project, instead of just .ts and .tsx files
-    "declaration": false, // Generate .d.ts files for every TypeScript or JavaScript file inside your project
+    "declaration": true, // Generate .d.ts files for every TypeScript or JavaScript file inside your project
     "lib": ["es2018"], // Specifies which default set of type definitions to use ("DOM", "ES6", etc)
     "module": "commonjs", // Sets the module system for the program. "CommonJS" for node projects.
     "noEmit": false, // Do not emit compiler output files like JavaScript source code, source-maps or declarations.
     "outDir": "dist", // .js (as well as .d.ts, .js.map, etc.) files will be emitted into this directory
-    "rootDir": "./", // The longest common path of all non-declaration input files
+    "rootDir": "./src", // The longest common path of all non-declaration input files
     "sourceMap": true, // Enables the generation of sourcemap files
     "target": "es6", // Target environment
 
